@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SynergEY.ai - User Story Tracker</title>
+    <style>
+        :root {
+            --primary: #2e2e38;
+            --primary-light: #464653;
+            --accent: #ffe600;
+            --accent-dark: #d4c000;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+            --cyan: #06b6d4;
+            --pink: #ec4899;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --bg-tertiary: #0f172a;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a1a2e 100%);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .header h1 span { color: var(--accent); }
+        .header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; }
+
+        .nav-tabs { display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+        .nav-tab.active { background: var(--accent); color: var(--primary); border-color: var(--accent); font-weight: 600; }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card.completed::before { background: var(--success); }
+        .stat-card.in-progress::before { background: var(--info); }
+        .stat-card.yet-to-start::before { background: var(--warning); }
+        .stat-card.high-priority::before { background: var(--danger); }
+
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-card.completed .stat-value {
+            background: linear-gradient(135deg, var(--success), var(--cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .stat-card.in-progress .stat-value {
+            background: linear-gradient(135deg, var(--info), var(--cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .stat-card.yet-to-start .stat-value {
+            background: linear-gradient(135deg, var(--warning), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .stat-card.high-priority .stat-value {
+            background: linear-gradient(135deg, var(--danger), var(--pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .progress-header h3 {
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .progress-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 600;
+            transition: width 0.5s ease;
+        }
+
+        .progress-segment.completed { background: linear-gradient(90deg, var(--success), var(--cyan)); }
+        .progress-segment.in-progress { background: linear-gradient(90deg, var(--info), var(--purple)); }
+        .progress-segment.yet-to-start { background: linear-gradient(90deg, var(--warning), var(--accent)); }
+        .progress-segment.not-set { background: var(--bg-hover); }
+
+        .progress-legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.completed { background: var(--success); }
+        .legend-dot.in-progress { background: var(--info); }
+        .legend-dot.yet-to-start { background: var(--warning); }
+        .legend-dot.not-set { background: var(--bg-hover); }
+
+        /* Filters */
+        .filters-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .filters-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: var(--bg-tertiary);
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 230, 0, 0.15);
+        }
+
+        .filter-group select option {
+            background: var(--bg-card);
+            color: var(--text);
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #1a1a2e 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-header h2 {
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .result-count {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .stories-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stories-table th {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+
+        .stories-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+            color: var(--text);
+        }
+
+        .stories-table tr:hover {
+            background: var(--bg-hover);
+        }
+
+        .stories-table tr.expanded {
+            background: rgba(255, 230, 0, 0.05);
+        }
+
+        .story-id {
+            font-weight: 600;
+            color: var(--accent);
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85rem;
+        }
+
+        .epic-badge {
+            display: inline-block;
+            padding: 0.35rem 0.65rem;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            color: white;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-completed { 
+            background: rgba(16, 185, 129, 0.15); 
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .status-in-progress { 
+            background: rgba(59, 130, 246, 0.15); 
+            color: var(--info);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        .status-yet-to-start { 
+            background: rgba(245, 158, 11, 0.15); 
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .status-not-set { 
+            background: var(--bg-hover); 
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .priority-high { 
+            background: rgba(239, 68, 68, 0.15); 
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .priority-normal { 
+            background: var(--bg-hover); 
+            color: var(--text-muted);
+        }
+
+        .feature-name {
+            font-weight: 500;
+            max-width: 250px;
+            color: var(--text);
+        }
+
+        .sprint-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 0.5rem;
+            background: linear-gradient(135deg, var(--info), var(--cyan));
+            color: white;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .effort-badge {
+            font-weight: 600;
+            color: var(--accent);
+            background: rgba(255, 230, 0, 0.1);
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .expand-btn {
+            background: var(--accent);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            transition: all 0.2s;
+        }
+
+        .expand-btn:hover {
+            background: var(--accent-dark);
+            transform: scale(1.05);
+        }
+
+        /* Expanded Row */
+        .expanded-content {
+            display: none;
+            background: var(--bg-tertiary);
+        }
+
+        .expanded-content.show {
+            display: table-row;
+        }
+
+        .expanded-inner {
+            padding: 1.5rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+        }
+
+        .detail-section h4 {
+            color: var(--text);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .detail-section pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* AI Solution Section */
+        .ai-solution {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .ai-solution h4 {
+            color: var(--success);
+            border-bottom-color: var(--success);
+        }
+
+        .ai-solution .solution-content {
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text);
+        }
+
+        .ai-solution .tech-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--success), var(--cyan));
+            color: white;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin: 0.25rem 0.25rem 0.25rem 0;
+        }
+
+        .comments-section {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .comments-section h4 {
+            color: var(--warning);
+            border-bottom-color: var(--warning);
+        }
+
+        /* Scrollable */
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--bg-hover);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1><span>SynergEY.ai</span> User Stories</h1>
+            <nav class="nav-tabs">
+                <a href="dashboard.html" class="nav-tab active">User Stories</a>
+                <a href="sprint-planner.html" class="nav-tab">Sprint Timeline</a>
+                <a href="progress-report.html" class="nav-tab">Progress Report</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalStories">0</div>
+                <div class="stat-label">Total User Stories</div>
+            </div>
+            <div class="stat-card completed">
+                <div class="stat-value" id="completedCount">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card in-progress">
+                <div class="stat-value" id="inProgressCount">0</div>
+                <div class="stat-label">In Progress</div>
+            </div>
+            <div class="stat-card yet-to-start">
+                <div class="stat-value" id="yetToStartCount">0</div>
+                <div class="stat-label">Yet to Start</div>
+            </div>
+            <div class="stat-card high-priority">
+                <div class="stat-value" id="highPriorityCount">0</div>
+                <div class="stat-label">High Priority</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalEffort">0</div>
+                <div class="stat-label">Total Effort (hrs)</div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-header">
+                <h3>Overall Progress</h3>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-segment completed" id="progressCompleted"></div>
+                <div class="progress-segment in-progress" id="progressInProgress"></div>
+                <div class="progress-segment yet-to-start" id="progressYetToStart"></div>
+                <div class="progress-segment not-set" id="progressNotSet"></div>
+            </div>
+            <div class="progress-legend">
+                <div class="legend-item"><div class="legend-dot completed"></div> Completed</div>
+                <div class="legend-item"><div class="legend-dot in-progress"></div> In Progress</div>
+                <div class="legend-item"><div class="legend-dot yet-to-start"></div> Yet to Start</div>
+                <div class="legend-item"><div class="legend-dot not-set"></div> Status Not Set</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <h3>Filter & Search</h3>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Search</label>
+                    <input type="text" id="searchInput" placeholder="Search ID, feature, user story...">
+                </div>
+                <div class="filter-group">
+                    <label>Epic</label>
+                    <select id="epicFilter">
+                        <option value="">All Epics</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="Completed">Completed</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Yet to start">Yet to Start</option>
+                        <option value="null">Not Set</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Priority</label>
+                    <select id="priorityFilter">
+                        <option value="">All Priorities</option>
+                        <option value="High">High</option>
+                        <option value="null">Normal/Not Set</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sprint</label>
+                    <select id="sprintFilter">
+                        <option value="">All Sprints</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2>User Stories</h2>
+                <span class="result-count"><span id="filteredCount">0</span> stories</span>
+            </div>
+            <div class="table-scroll">
+                <table class="stories-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Epic</th>
+                            <th>Feature</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Sprint</th>
+                            <th>Effort (hrs)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="storiesTableBody">
+                        <tr><td colspan="8" class="loading">Loading user stories...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // User stories data will be loaded here
+        let userStories = [];
+        let filteredStories = [];
+
+        // Load data from JSON file
+        async function loadData() {
+            try {
+                const response = await fetch('user_stories.json');
+                userStories = await response.json();
+                initializeApp();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('storiesTableBody').innerHTML = 
+                    '<tr><td colspan="8" class="empty-state"><h3>Error Loading Data</h3><p>Could not load user_stories.json. Please ensure the file exists.</p></td></tr>';
+            }
+        }
+
+        // Generate AI Suggested Solution based on user story content
+        function generateAISolution(story) {
+            const solutions = [];
+            const techStack = [];
+            
+            const feature = (story.Feature || '').toLowerCase();
+            const userStory = (story.User_Story || '').toLowerCase();
+            const scenario = (story.Scenario || '').toLowerCase();
+            const acceptance = (story.Acceptance_Criteria || '').toLowerCase();
+            const combined = `${feature} ${userStory} ${scenario} ${acceptance}`;
+            
+            // Authentication & SSO
+            if (combined.includes('sso') || combined.includes('login') || combined.includes('authentication') || combined.includes('sign in')) {
+                techStack.push('OAuth 2.0', 'OpenID Connect', 'JWT');
+                solutions.push('Implement OAuth 2.0/OIDC flow with Capital Edge SSO provider.');
+                solutions.push('Use secure token storage (HttpOnly cookies or secure session storage).');
+                solutions.push('Implement token refresh mechanism for seamless user experience.');
+                solutions.push('Add proper error handling for auth failures with user-friendly messages.');
+            }
+            
+            // Session Management
+            if (combined.includes('session') || combined.includes('timeout') || combined.includes('watermark')) {
+                techStack.push('Redis', 'Session Store');
+                solutions.push('Implement server-side session management with Redis for scalability.');
+                solutions.push('Use heartbeat mechanism for session activity tracking.');
+                solutions.push('Implement graceful timeout warnings with countdown dialog.');
+            }
+            
+            // Project Creation
+            if (combined.includes('project') && (combined.includes('create') || combined.includes('new') || combined.includes('wizard'))) {
+                techStack.push('React Forms', 'Validation', 'REST API');
+                solutions.push('Build multi-step wizard component with form state management.');
+                solutions.push('Implement real-time validation with Yup/Zod schema validation.');
+                solutions.push('Create modular form sections for different project types.');
+                solutions.push('Add auto-save draft functionality to prevent data loss.');
+            }
+            
+            // Data Upload & Processing
+            if (combined.includes('upload') || combined.includes('file') || combined.includes('csv') || combined.includes('excel')) {
+                techStack.push('File Upload API', 'Data Processing', 'Queue System');
+                solutions.push('Implement chunked file upload for large files with progress indicator.');
+                solutions.push('Use background job processing (e.g., Bull/BullMQ) for data transformation.');
+                solutions.push('Add file validation for format, size, and content structure.');
+                solutions.push('Implement rollback capability for failed data imports.');
+            }
+            
+            // Dashboard & Visualization
+            if (combined.includes('dashboard') || combined.includes('chart') || combined.includes('visualization') || combined.includes('report')) {
+                techStack.push('Chart.js/D3.js', 'Data Aggregation', 'Caching');
+                solutions.push('Implement responsive dashboard with configurable widgets.');
+                solutions.push('Use server-side data aggregation with caching for performance.');
+                solutions.push('Add export functionality for charts and reports (PDF/Excel).');
+                solutions.push('Implement real-time data refresh with WebSocket or polling.');
+            }
+            
+            // API Integration
+            if (combined.includes('api') || combined.includes('integration') || combined.includes('census') || combined.includes('spend')) {
+                techStack.push('REST/GraphQL', 'API Gateway', 'Error Handling');
+                solutions.push('Create abstraction layer for external API integrations.');
+                solutions.push('Implement retry logic with exponential backoff for API failures.');
+                solutions.push('Add request/response logging for debugging and audit.');
+                solutions.push('Use circuit breaker pattern for resilient API calls.');
+            }
+            
+            // Taxonomy & Classification
+            if (combined.includes('taxonomy') || combined.includes('classification') || combined.includes('mapping') || combined.includes('normalize')) {
+                techStack.push('Mapping Engine', 'ML Classification', 'Rules Engine');
+                solutions.push('Build configurable mapping rules engine with UI editor.');
+                solutions.push('Implement fuzzy matching for approximate text matching.');
+                solutions.push('Create confidence scoring for automated mappings.');
+                solutions.push('Add manual override capability with audit trail.');
+            }
+            
+            // Data Validation
+            if (combined.includes('validation') || combined.includes('verify') || combined.includes('accuracy') || combined.includes('completeness')) {
+                techStack.push('Validation Framework', 'Data Quality');
+                solutions.push('Implement multi-level validation (format, business rules, cross-field).');
+                solutions.push('Create validation dashboard showing data quality metrics.');
+                solutions.push('Add batch validation for bulk data processing.');
+                solutions.push('Implement validation rules as configurable JSON schemas.');
+            }
+            
+            // Calculation & Analysis
+            if (combined.includes('calculate') || combined.includes('analysis') || combined.includes('benchmark') || combined.includes('headcount')) {
+                techStack.push('Calculation Engine', 'Analytics', 'Data Pipeline');
+                solutions.push('Build modular calculation engine with configurable formulas.');
+                solutions.push('Implement version control for calculation logic changes.');
+                solutions.push('Add detailed calculation audit trail showing inputs and outputs.');
+                solutions.push('Create preview mode for calculation results before committing.');
+            }
+            
+            // Currency & Conversion
+            if (combined.includes('currency') || combined.includes('conversion') || combined.includes('exchange')) {
+                techStack.push('Currency API', 'Exchange Rates');
+                solutions.push('Integrate with reliable exchange rate API (e.g., Open Exchange Rates).');
+                solutions.push('Implement rate caching with configurable refresh interval.');
+                solutions.push('Store original values alongside converted for audit purposes.');
+                solutions.push('Add multi-currency support with user-selectable display currency.');
+            }
+            
+            // Export & Deliverables
+            if (combined.includes('export') || combined.includes('deliverable') || combined.includes('output') || combined.includes('download')) {
+                techStack.push('Export Engine', 'Template System');
+                solutions.push('Implement template-based document generation (e.g., docxtemplater).');
+                solutions.push('Add batch export capability with ZIP packaging.');
+                solutions.push('Create customizable export formats and branding.');
+                solutions.push('Implement async generation for large exports with progress tracking.');
+            }
+            
+            // Default suggestions if nothing specific matched
+            if (solutions.length === 0) {
+                techStack.push('React', 'REST API', 'SQL/NoSQL');
+                solutions.push('Implement clean component architecture following atomic design principles.');
+                solutions.push('Use proper error boundaries and loading states for better UX.');
+                solutions.push('Add comprehensive logging and monitoring for debugging.');
+                solutions.push('Follow accessibility guidelines (WCAG 2.1) for inclusive design.');
+            }
+            
+            return { solutions, techStack };
+        }
+
+        // Initialize application
+        function initializeApp() {
+            populateFilters();
+            updateStats();
+            filterAndRender();
+            setupEventListeners();
+        }
+
+        // Populate filter dropdowns
+        function populateFilters() {
+            // Epics
+            const epics = [...new Set(userStories.map(s => s.Epic).filter(e => e))].sort();
+            const epicSelect = document.getElementById('epicFilter');
+            epics.forEach(epic => {
+                const option = document.createElement('option');
+                option.value = epic;
+                option.textContent = epic.length > 50 ? epic.substring(0, 47) + '...' : epic;
+                epicSelect.appendChild(option);
+            });
+            
+            // Sprints
+            const sprints = [...new Set(userStories.map(s => s.Sprint).filter(s => s !== null))].sort((a, b) => a - b);
+            const sprintSelect = document.getElementById('sprintFilter');
+            sprints.forEach(sprint => {
+                const option = document.createElement('option');
+                option.value = sprint;
+                option.textContent = `Sprint ${sprint}`;
+                sprintSelect.appendChild(option);
+            });
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = userStories.length;
+            const completed = userStories.filter(s => s.Status === 'Completed').length;
+            const inProgress = userStories.filter(s => s.Status === 'In Progress').length;
+            const yetToStart = userStories.filter(s => s.Status === 'Yet to start').length;
+            const notSet = total - completed - inProgress - yetToStart;
+            const highPriority = userStories.filter(s => s.Priority === 'High').length;
+            const totalEffort = userStories.reduce((sum, s) => sum + (s.Effort_Required || 0), 0);
+            
+            document.getElementById('totalStories').textContent = total;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('inProgressCount').textContent = inProgress;
+            document.getElementById('yetToStartCount').textContent = yetToStart;
+            document.getElementById('highPriorityCount').textContent = highPriority;
+            document.getElementById('totalEffort').textContent = totalEffort.toLocaleString();
+            
+            // Update progress bar
+            const completedPct = (completed / total * 100).toFixed(1);
+            const inProgressPct = (inProgress / total * 100).toFixed(1);
+            const yetToStartPct = (yetToStart / total * 100).toFixed(1);
+            const notSetPct = (notSet / total * 100).toFixed(1);
+            
+            document.getElementById('progressCompleted').style.width = completedPct + '%';
+            document.getElementById('progressCompleted').textContent = completed > 0 ? completed : '';
+            
+            document.getElementById('progressInProgress').style.width = inProgressPct + '%';
+            document.getElementById('progressInProgress').textContent = inProgress > 0 ? inProgress : '';
+            
+            document.getElementById('progressYetToStart').style.width = yetToStartPct + '%';
+            document.getElementById('progressYetToStart').textContent = yetToStart > 0 ? yetToStart : '';
+            
+            document.getElementById('progressNotSet').style.width = notSetPct + '%';
+            document.getElementById('progressNotSet').textContent = notSet > 0 ? notSet : '';
+            
+            document.getElementById('progressPercent').textContent = completedPct + '% Complete';
+        }
+
+        // Filter and render stories
+        function filterAndRender() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const epic = document.getElementById('epicFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const priority = document.getElementById('priorityFilter').value;
+            const sprint = document.getElementById('sprintFilter').value;
+            
+            filteredStories = userStories.filter(story => {
+                // Search filter
+                if (search) {
+                    const searchFields = [story.ID, story.Feature, story.User_Story, story.Epic, story.Tool_Process].join(' ').toLowerCase();
+                    if (!searchFields.includes(search)) return false;
+                }
+                
+                // Epic filter
+                if (epic && story.Epic !== epic) return false;
+                
+                // Status filter
+                if (status === 'null' && story.Status !== null) return false;
+                if (status && status !== 'null' && story.Status !== status) return false;
+                
+                // Priority filter
+                if (priority === 'null' && story.Priority !== null) return false;
+                if (priority && priority !== 'null' && story.Priority !== priority) return false;
+                
+                // Sprint filter
+                if (sprint && story.Sprint != sprint) return false;
+                
+                return true;
+            });
+            
+            renderTable();
+        }
+
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('storiesTableBody');
+            document.getElementById('filteredCount').textContent = filteredStories.length;
+            
+            if (filteredStories.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><h3>No Stories Found</h3><p>Try adjusting your filters</p></td></tr>';
+                return;
+            }
+            
+            let html = '';
+            filteredStories.forEach((story, index) => {
+                const statusClass = getStatusClass(story.Status);
+                const priorityClass = story.Priority === 'High' ? 'priority-high' : 'priority-normal';
+                
+                html += `
+                    <tr id="row-${index}">
+                        <td><span class="story-id">${story.ID}</span></td>
+                        <td><span class="epic-badge" title="${escapeHtml(story.Epic || 'N/A')}">${escapeHtml(truncate(story.Epic, 25))}</span></td>
+                        <td class="feature-name">${escapeHtml(story.Feature || 'N/A')}</td>
+                        <td><span class="status-badge ${statusClass}">${story.Status || 'Not Set'}</span></td>
+                        <td><span class="priority-badge ${priorityClass}">${story.Priority || 'Normal'}</span></td>
+                        <td>${story.Sprint ? `<span class="sprint-badge">${story.Sprint}</span>` : '-'}</td>
+                        <td><span class="effort-badge">${story.Effort_Required || '-'}</span></td>
+                        <td><button class="expand-btn" onclick="toggleExpand(${index})">Details</button></td>
+                    </tr>
+                    <tr class="expanded-content" id="expanded-${index}">
+                        <td colspan="8">
+                            ${renderExpandedContent(story)}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        // Render expanded content for a story
+        function renderExpandedContent(story) {
+            const aiSolution = generateAISolution(story);
+            
+            return `
+                <div class="expanded-inner">
+                    <div class="detail-grid">
+                        <div class="detail-section">
+                            <h4>User Story</h4>
+                            <pre>${escapeHtml(story.User_Story || 'No user story provided')}</pre>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Scenarios</h4>
+                            <pre>${escapeHtml(story.Scenario || 'No scenarios defined')}</pre>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Acceptance Criteria</h4>
+                            <pre>${escapeHtml(story.Acceptance_Criteria || 'No acceptance criteria defined')}</pre>
+                        </div>
+                        <div class="detail-section ai-solution">
+                            <h4>AI Suggested Solution</h4>
+                            <div class="solution-content">
+                                <p><strong>Recommended Tech Stack:</strong></p>
+                                <div style="margin-bottom: 0.75rem;">
+                                    ${aiSolution.techStack.map(t => `<span class="tech-tag">${t}</span>`).join('')}
+                                </div>
+                                <p><strong>Implementation Recommendations:</strong></p>
+                                <ul style="margin-left: 1.25rem; margin-top: 0.5rem;">
+                                    ${aiSolution.solutions.map(s => `<li style="margin-bottom: 0.5rem;">${escapeHtml(s)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        ${story.Comments ? `
+                        <div class="detail-section comments-section">
+                            <h4>Comments / Notes</h4>
+                            <pre>${escapeHtml(story.Comments)}</pre>
+                        </div>
+                        ` : ''}
+                        <div class="detail-section">
+                            <h4>Additional Details</h4>
+                            <table style="width: 100%; font-size: 0.85rem;">
+                                <tr><td style="padding: 0.25rem 0;"><strong>Tool/Process:</strong></td><td>${escapeHtml(story.Tool_Process || '-')}</td></tr>
+                                <tr><td style="padding: 0.25rem 0;"><strong>Effort Points:</strong></td><td>${story.Effort_Point || '-'}</td></tr>
+                                <tr><td style="padding: 0.25rem 0;"><strong>Dependencies:</strong></td><td>${escapeHtml(story.Dependencies || 'None')}</td></tr>
+                                <tr><td style="padding: 0.25rem 0;"><strong>Version:</strong></td><td>${escapeHtml(story.Version_Assignment || '-')}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Toggle expanded row
+        function toggleExpand(index) {
+            const expandedRow = document.getElementById(`expanded-${index}`);
+            const mainRow = document.getElementById(`row-${index}`);
+            const isShowing = expandedRow.classList.contains('show');
+            
+            // Close all other expanded rows
+            document.querySelectorAll('.expanded-content').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('.stories-table tr').forEach(el => el.classList.remove('expanded'));
+            
+            if (!isShowing) {
+                expandedRow.classList.add('show');
+                mainRow.classList.add('expanded');
+            }
+        }
+
+        // Helper functions
+        function getStatusClass(status) {
+            if (status === 'Completed') return 'status-completed';
+            if (status === 'In Progress') return 'status-in-progress';
+            if (status === 'Yet to start') return 'status-yet-to-start';
+            return 'status-not-set';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function truncate(text, length) {
+            if (!text) return 'N/A';
+            return text.length > length ? text.substring(0, length) + '...' : text;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', debounce(filterAndRender, 300));
+            document.getElementById('epicFilter').addEventListener('change', filterAndRender);
+            document.getElementById('statusFilter').addEventListener('change', filterAndRender);
+            document.getElementById('priorityFilter').addEventListener('change', filterAndRender);
+            document.getElementById('sprintFilter').addEventListener('change', filterAndRender);
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>

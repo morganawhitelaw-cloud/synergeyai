@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SynergEY.ai - Sprint Timeline Planner</title>
+    <style>
+        :root {
+            --primary: #2e2e38;
+            --primary-light: #464653;
+            --accent: #ffe600;
+            --accent-dark: #d4c000;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+            --cyan: #06b6d4;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a1a2e 100%);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 { font-size: 1.4rem; font-weight: 600; }
+        .header h1 span { color: var(--accent); }
+
+        .nav-tabs { display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+        .nav-tab.active { background: var(--accent); color: var(--primary); border-color: var(--accent); font-weight: 600; }
+
+        .reset-btn {
+            padding: 0.5rem 0.75rem;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            color: var(--danger);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .reset-btn:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        .container { max-width: 1800px; margin: 0 auto; padding: 1.5rem; }
+
+        .view-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--bg-card);
+            padding: 0.5rem;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .view-tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .view-tab:hover { color: var(--text); background: var(--bg-hover); }
+        .view-tab.active { background: var(--accent); color: var(--primary); font-weight: 600; }
+
+        .view-container { display: none; }
+        .view-container.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stats */
+        .overview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--info));
+        }
+
+        .stat-card.success::before { background: linear-gradient(90deg, var(--success), #34d399); }
+        .stat-card.warning::before { background: linear-gradient(90deg, var(--warning), #fbbf24); }
+        .stat-card.info::before { background: linear-gradient(90deg, var(--info), #60a5fa); }
+        .stat-card.purple::before { background: linear-gradient(90deg, var(--purple), #a78bfa); }
+
+        .stat-value { font-size: 2.25rem; font-weight: 700; }
+        .stat-label { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; }
+
+        /* Sprint Cards */
+        .sprint-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .sprint-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sprint-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-color: var(--accent);
+        }
+
+        .sprint-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .sprint-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .sprint-0 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .sprint-1 { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .sprint-2 { background: linear-gradient(135deg, #10b981, #059669); }
+        .sprint-3 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .sprint-4 { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .sprint-5 { background: linear-gradient(135deg, #ec4899, #db2777); }
+        .sprint-9 { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .sprint-10 { background: linear-gradient(135deg, #84cc16, #65a30d); }
+        .sprint-11 { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .sprint-12 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+
+        .sprint-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .sprint-dates { font-size: 0.8rem; color: var(--text-muted); }
+
+        .progress-ring-container { position: relative; width: 80px; height: 80px; }
+        .progress-ring { transform: rotate(-90deg); }
+        .progress-ring-bg { fill: none; stroke: var(--border); stroke-width: 6; }
+        .progress-ring-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+        .progress-ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1rem; font-weight: 700; }
+
+        .task-mini-list { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+        .task-mini { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0; font-size: 0.8rem; color: var(--text-muted); }
+        .task-mini-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .task-mini-dot.completed { background: var(--success); }
+        .task-mini-dot.in-progress { background: var(--info); }
+        .task-mini-dot.not-started { background: var(--warning); }
+        .task-mini-text { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Sprint Detail Panel */
+        .sprint-detail-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: flex-end;
+        }
+
+        .sprint-detail-overlay.show { display: flex; }
+
+        .sprint-detail-panel {
+            width: 650px;
+            max-width: 100%;
+            height: 100%;
+            background: var(--bg-card);
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.3s ease;
+            border-left: 1px solid var(--border);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .sprint-detail-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background: var(--bg);
+        }
+
+        .sprint-detail-title h2 { font-size: 1.2rem; margin: 0.5rem 0 0.25rem 0; }
+        .sprint-detail-title p { color: var(--text-muted); font-size: 0.85rem; }
+
+        .close-btn {
+            background: var(--bg-hover);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover { background: var(--danger); }
+
+        .sprint-detail-progress {
+            padding: 1rem 1.5rem;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .progress-stats { display: flex; gap: 2rem; margin-bottom: 0.75rem; }
+        .progress-stat { display: flex; flex-direction: column; }
+        .progress-stat-value { font-size: 1.25rem; font-weight: 700; }
+        .progress-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+
+        .detail-progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+        .detail-progress-fill { height: 100%; background: linear-gradient(90deg, var(--success), #34d399); border-radius: 3px; transition: width 0.5s ease; }
+
+        .sprint-detail-tasks { flex: 1; overflow-y: auto; padding: 1rem; }
+
+        .detail-task-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .detail-task-card:hover { border-color: var(--accent); }
+        .detail-task-card.expanded { border-color: var(--accent); }
+
+        .detail-task-header {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .detail-task-status { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .detail-task-status.completed { background: var(--success); }
+        .detail-task-status.in-progress { background: var(--info); }
+        .detail-task-status.not-started { background: var(--warning); }
+
+        .detail-task-info { flex: 1; min-width: 0; }
+        .detail-task-name { font-weight: 500; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .detail-task-meta { display: flex; gap: 0.75rem; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+        .detail-task-type { padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.65rem; font-weight: 600; background: var(--bg-hover); }
+        .detail-task-type.milestone { background: var(--accent); color: var(--primary); }
+
+        .detail-task-expand { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.25rem; transition: transform 0.2s; }
+        .detail-task-expand.expanded { transform: rotate(180deg); }
+
+        .detail-task-body { display: none; padding: 0 1rem 1rem 1rem; border-top: 1px solid var(--border); }
+        .detail-task-body.show { display: block; }
+
+        .detail-form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; padding-top: 1rem; }
+        .detail-form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+        .detail-form-group.full-width { grid-column: span 2; }
+        .detail-form-group label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+
+        .detail-form-group input,
+        .detail-form-group select,
+        .detail-form-group textarea {
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.85rem;
+        }
+
+        .detail-form-group input:focus,
+        .detail-form-group select:focus,
+        .detail-form-group textarea:focus { outline: none; border-color: var(--accent); }
+
+        .detail-form-group textarea { min-height: 60px; resize: vertical; }
+
+        .detail-task-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+
+        .sprint-detail-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            background: var(--bg);
+        }
+
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--accent); color: var(--primary); }
+        .btn-primary:hover { background: var(--accent-dark); }
+        .btn-secondary { background: var(--bg-hover); color: var(--text); }
+        .btn-secondary:hover { background: var(--border); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.75rem; }
+
+        /* Kanban */
+        .kanban-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; min-height: 500px; }
+
+        .kanban-column {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kanban-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .kanban-title { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+        .kanban-title-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .kanban-count { background: var(--bg-hover); padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; color: var(--text-muted); }
+
+        .kanban-tasks { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .kanban-task {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 0.875rem;
+            border: 1px solid var(--border);
+            cursor: grab;
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), 
+                        box-shadow 0.2s ease,
+                        border-color 0.2s ease,
+                        opacity 0.2s ease;
+            position: relative;
+        }
+
+        .kanban-task:hover { 
+            border-color: var(--accent); 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .kanban-task:active {
+            cursor: grabbing;
+        }
+
+        .kanban-task.dragging { 
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        
+        .kanban-task.drag-preview {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            transform: rotate(3deg) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 2px var(--accent);
+            border-color: var(--accent);
+            opacity: 1;
+        }
+
+        .kanban-column.drag-over {
+            background: rgba(255, 230, 0, 0.05);
+            border-color: var(--accent);
+            box-shadow: inset 0 0 20px rgba(255, 230, 0, 0.1);
+        }
+
+        .kanban-column.drag-over .kanban-tasks {
+            min-height: 100px;
+        }
+
+        .drop-placeholder {
+            height: 80px;
+            border: 2px dashed var(--accent);
+            border-radius: 10px;
+            background: rgba(255, 230, 0, 0.1);
+            margin-bottom: 0.5rem;
+            transition: all 0.2s ease;
+            animation: placeholderPulse 1s ease infinite;
+        }
+
+        @keyframes placeholderPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .kanban-task.dropping {
+            animation: dropIn 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        @keyframes dropIn {
+            0% { 
+                opacity: 0;
+                transform: scale(1.1) translateY(-10px);
+            }
+            100% { 
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .kanban-task-sprint { font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block; margin-bottom: 0.4rem; }
+        .kanban-task-title { font-size: 0.85rem; font-weight: 500; margin-bottom: 0.4rem; line-height: 1.3; }
+        .kanban-task-meta { display: flex; gap: 0.5rem; font-size: 0.7rem; color: var(--text-muted); }
+
+        /* Timeline */
+        .timeline-view { position: relative; padding-left: 40px; }
+        .timeline-line { position: absolute; left: 15px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, var(--accent), var(--purple), var(--info), var(--success)); }
+
+        .timeline-item { position: relative; padding: 1rem 0 2rem 2rem; }
+        .timeline-dot { position: absolute; left: -32px; top: 1.25rem; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent); }
+        .timeline-dot.milestone { width: 20px; height: 20px; left: -35px; border-width: 4px; background: var(--accent); }
+
+        .timeline-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .timeline-content:hover { border-color: var(--accent); transform: translateX(8px); }
+        .timeline-date { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .timeline-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .timeline-desc { font-size: 0.85rem; color: var(--text-muted); }
+
+        .timeline-tasks { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+        .timeline-task-chip { padding: 0.3rem 0.6rem; background: var(--bg); border-radius: 20px; font-size: 0.7rem; border: 1px solid var(--border); display: flex; align-items: center; gap: 0.3rem; }
+        .timeline-task-chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+        /* Roadmap - Clean Horizontal Timeline */
+        .roadmap-container {
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .roadmap-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .roadmap-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .roadmap-legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-left: auto;
+            font-size: 0.75rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.completed { background: var(--success); }
+        .legend-dot.in-progress { background: var(--info); }
+        .legend-dot.not-started { background: var(--border); }
+
+        .roadmap-timeline-wrapper {
+            position: relative;
+            min-width: max-content;
+        }
+
+        .roadmap-line {
+            position: absolute;
+            top: 24px;
+            left: 40px;
+            right: 40px;
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            z-index: 0;
+        }
+
+        .roadmap-line-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--info));
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        .roadmap-sprints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .roadmap-sprint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .roadmap-node {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 3px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .roadmap-node:hover {
+            transform: scale(1.1);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .roadmap-node.completed {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .roadmap-node.in-progress {
+            background: var(--bg-card);
+            border-color: var(--info);
+            color: var(--info);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .roadmap-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .roadmap-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .roadmap-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .roadmap-card h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .roadmap-card-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .roadmap-progress {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .roadmap-progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .roadmap-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.75rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Effort View */
+        .effort-summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .effort-summary-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .effort-summary-card .big-number {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .effort-summary-card .label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        .effort-summary-card.fe .big-number {
+            background: none;
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: var(--info);
+            color: var(--info);
+        }
+
+        .effort-summary-card.be .big-number {
+            background: none;
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: var(--purple);
+            color: var(--purple);
+        }
+
+        .effort-content {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .effort-content { grid-template-columns: 1fr; }
+        }
+
+        /* Mini Gantt Chart */
+        .gantt-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mini-gantt {
+            overflow-x: auto;
+        }
+
+        .gantt-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        .gantt-header {
+            display: grid;
+            grid-template-columns: 180px repeat(16, 1fr);
+            gap: 2px;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .gantt-header-cell {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            padding: 0.25rem;
+        }
+
+        .gantt-row {
+            display: grid;
+            grid-template-columns: 180px repeat(16, 1fr);
+            gap: 2px;
+            margin-bottom: 4px;
+            align-items: center;
+        }
+
+        .gantt-module-name {
+            font-size: 0.7rem;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 0.5rem;
+        }
+
+        .gantt-cell {
+            height: 24px;
+            border-radius: 3px;
+            background: var(--bg-tertiary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .gantt-cell:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: scale(1.1);
+        }
+
+        .gantt-cell.active {
+            background: linear-gradient(135deg, var(--success), var(--cyan));
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .gantt-cell.active:hover {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+        }
+
+        .gantt-cell.active-start {
+            border-radius: 12px 3px 3px 12px;
+        }
+
+        .gantt-cell.active-end {
+            border-radius: 3px 12px 12px 3px;
+        }
+
+        .gantt-cell.active-single {
+            border-radius: 12px;
+        }
+
+        /* Sprint Workload */
+        .workload-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sprint-workload {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.75rem;
+        }
+
+        .workload-sprint {
+            text-align: center;
+        }
+
+        .workload-bar-container {
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .workload-bar {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 2px;
+        }
+
+        .workload-seg {
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: white;
+            min-height: 2px;
+        }
+
+        .workload-seg.fe {
+            background: linear-gradient(135deg, var(--info), var(--cyan));
+        }
+
+        .workload-seg.be {
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+        }
+
+        .workload-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .workload-hours {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .module-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .module-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .module-card:hover {
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .module-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .module-sprints {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .module-total {
+            text-align: right;
+        }
+
+        .module-total .hours {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .module-total .hours-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .module-stacked-bar-container {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 0.75rem;
+        }
+
+        .module-stacked-bar {
+            height: 40px;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            width: 100%;
+        }
+
+        .stacked-seg {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.2s ease;
+            cursor: default;
+            min-width: 40px;
+        }
+
+        .stacked-seg:hover {
+            filter: brightness(1.15);
+        }
+
+        .stacked-seg.fe {
+            background: linear-gradient(135deg, var(--info), var(--cyan));
+        }
+
+        .stacked-seg.be {
+            background: linear-gradient(135deg, var(--purple), #a855f7);
+        }
+
+        .stacked-seg.design {
+            background: linear-gradient(135deg, var(--warning), var(--accent));
+        }
+
+        .stacked-seg span {
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        .effort-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .resource-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+        }
+
+        .resource-card h4 {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .resource-visual {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .hours-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .hours-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .hours-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .hours-color.fe { background: var(--info); }
+        .hours-color.be { background: var(--purple); }
+        .hours-color.design { background: var(--warning); }
+
+        .hours-type {
+            flex: 1;
+            font-size: 0.85rem;
+        }
+
+        .hours-value {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .stacked-bar {
+            height: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            margin-top: 1rem;
+        }
+
+        .stacked-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            transition: width 0.5s ease;
+        }
+
+        .stacked-segment.fe { background: linear-gradient(90deg, var(--info), var(--cyan)); }
+        .stacked-segment.be { background: linear-gradient(90deg, var(--purple), var(--pink)); }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        @media (max-width: 1024px) {
+            .kanban-container { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; gap: 1rem; }
+            .kanban-container { grid-template-columns: 1fr; }
+            .sprint-cards-grid { grid-template-columns: 1fr; }
+            .sprint-detail-panel { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1><span>SynergEY.ai</span> Sprint Timeline</h1>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <nav class="nav-tabs">
+                    <a href="dashboard.html" class="nav-tab">User Stories</a>
+                    <a href="sprint-planner.html" class="nav-tab active">Sprint Timeline</a>
+                    <a href="progress-report.html" class="nav-tab">Progress Report</a>
+                </nav>
+                <button onclick="resetToOriginal()" class="reset-btn" title="Reset to original data">Reset</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="view-tabs">
+            <button class="view-tab active" onclick="switchView('overview')">Overview</button>
+            <button class="view-tab" onclick="switchView('kanban')">Kanban Board</button>
+            <button class="view-tab" onclick="switchView('effort')">Effort & Resources</button>
+            <button class="view-tab" onclick="switchView('roadmap')">Roadmap</button>
+            <button class="view-tab" onclick="switchView('timeline')">Timeline</button>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div id="overview-view" class="view-container active">
+            <div class="overview-stats">
+                <div class="stat-card"><div class="stat-value" id="totalTasks">0</div><div class="stat-label">Total Tasks</div></div>
+                <div class="stat-card success"><div class="stat-value" id="completedTasks">0</div><div class="stat-label">Completed</div></div>
+                <div class="stat-card info"><div class="stat-value" id="inProgressTasks">0</div><div class="stat-label">In Progress</div></div>
+                <div class="stat-card warning"><div class="stat-value" id="notStartedTasks">0</div><div class="stat-label">Not Started</div></div>
+                <div class="stat-card purple"><div class="stat-value" id="completionRate">0%</div><div class="stat-label">Completion</div></div>
+            </div>
+            <h2 style="margin-bottom: 1.5rem; font-size: 1.1rem;">Sprint Progress</h2>
+            <div class="sprint-cards-grid" id="sprintCardsGrid"></div>
+        </div>
+
+        <!-- KANBAN -->
+        <div id="kanban-view" class="view-container">
+            <div class="kanban-container">
+                <div class="kanban-column" data-status="Not Started">
+                    <div class="kanban-header">
+                        <div class="kanban-title"><div class="kanban-title-dot" style="background: var(--warning);"></div>Not Started</div>
+                        <span class="kanban-count" id="kanban-not-started-count">0</span>
+                    </div>
+                    <div class="kanban-tasks" id="kanban-not-started"></div>
+                </div>
+                <div class="kanban-column" data-status="In Progress">
+                    <div class="kanban-header">
+                        <div class="kanban-title"><div class="kanban-title-dot" style="background: var(--info);"></div>In Progress</div>
+                        <span class="kanban-count" id="kanban-in-progress-count">0</span>
+                    </div>
+                    <div class="kanban-tasks" id="kanban-in-progress"></div>
+                </div>
+                <div class="kanban-column" data-status="On Track">
+                    <div class="kanban-header">
+                        <div class="kanban-title"><div class="kanban-title-dot" style="background: var(--cyan);"></div>On Track</div>
+                        <span class="kanban-count" id="kanban-on-track-count">0</span>
+                    </div>
+                    <div class="kanban-tasks" id="kanban-on-track"></div>
+                </div>
+                <div class="kanban-column" data-status="Completed">
+                    <div class="kanban-header">
+                        <div class="kanban-title"><div class="kanban-title-dot" style="background: var(--success);"></div>Completed</div>
+                        <span class="kanban-count" id="kanban-completed-count">0</span>
+                    </div>
+                    <div class="kanban-tasks" id="kanban-completed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EFFORT & RESOURCES -->
+        <div id="effort-view" class="view-container">
+            <div class="effort-summary-cards" id="effortSummary"></div>
+            
+            <!-- Mini Gantt Chart -->
+            <div class="gantt-section">
+                <h3 style="margin-bottom: 1rem; font-size: 1rem;">Development Timeline</h3>
+                <div class="mini-gantt" id="miniGantt"></div>
+            </div>
+
+            <!-- Sprint Workload -->
+            <div class="workload-section">
+                <h3 style="margin-bottom: 1rem; font-size: 1rem;">Workload by Sprint</h3>
+                <div class="sprint-workload" id="sprintWorkload"></div>
+            </div>
+
+            <div class="effort-content">
+                <div class="effort-main">
+                    <h3 style="margin-bottom: 1rem; font-size: 1rem;">Module Breakdown</h3>
+                    <div class="module-cards" id="moduleCards"></div>
+                </div>
+                <div class="effort-sidebar">
+                    <div class="resource-card">
+                        <h4>Hours by Type</h4>
+                        <div class="hours-breakdown" id="hoursBreakdown"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROADMAP -->
+        <div id="roadmap-view" class="view-container">
+            <div class="roadmap-container">
+                <div class="roadmap-header">
+                    <div class="roadmap-title">Sprint Roadmap</div>
+                    <div class="roadmap-legend">
+                        <div class="legend-item"><div class="legend-dot completed"></div> Completed</div>
+                        <div class="legend-item"><div class="legend-dot in-progress"></div> In Progress</div>
+                        <div class="legend-item"><div class="legend-dot not-started"></div> Not Started</div>
+                    </div>
+                </div>
+                <div class="roadmap-timeline-wrapper">
+                    <div class="roadmap-line"><div class="roadmap-line-progress" id="roadmapLineProgress"></div></div>
+                    <div class="roadmap-sprints" id="roadmapSprints"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIMELINE -->
+        <div id="timeline-view" class="view-container">
+            <div class="timeline-view" id="timelineContainer"></div>
+        </div>
+    </div>
+
+    <!-- Sprint Detail Panel -->
+    <div class="sprint-detail-overlay" id="sprintDetailOverlay">
+        <div class="sprint-detail-panel">
+            <div class="sprint-detail-header">
+                <div class="sprint-detail-title">
+                    <span class="sprint-badge" id="sprintDetailBadge">Sprint 0</span>
+                    <h2 id="sprintDetailName">Sprint Name</h2>
+                    <p id="sprintDetailMeta">0 tasks</p>
+                </div>
+                <button class="close-btn" onclick="closeSprintDetail()">&times;</button>
+            </div>
+            <div class="sprint-detail-progress">
+                <div class="progress-stats">
+                    <div class="progress-stat"><span class="progress-stat-value" id="detailCompleted">0</span><span class="progress-stat-label">Completed</span></div>
+                    <div class="progress-stat"><span class="progress-stat-value" id="detailInProgress">0</span><span class="progress-stat-label">In Progress</span></div>
+                    <div class="progress-stat"><span class="progress-stat-value" id="detailNotStarted">0</span><span class="progress-stat-label">Not Started</span></div>
+                    <div class="progress-stat"><span class="progress-stat-value" id="detailProgress">0%</span><span class="progress-stat-label">Progress</span></div>
+                </div>
+                <div class="detail-progress-bar"><div class="detail-progress-fill" id="detailProgressBar"></div></div>
+            </div>
+            <div class="sprint-detail-tasks" id="sprintDetailTasks"></div>
+            <div class="sprint-detail-footer">
+                <button class="btn btn-secondary" onclick="closeSprintDetail()">Close</button>
+                <button class="btn btn-primary" onclick="addTaskToSprint()">+ Add Task</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sprintData = [];
+        let effortData = null;
+        let currentSprintNum = null;
+
+        // LocalStorage keys
+        const STORAGE_KEYS = {
+            sprintData: 'synergey_sprint_data',
+            effortData: 'synergey_effort_data'
+        };
+
+        // Save data to localStorage
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEYS.sprintData, JSON.stringify(sprintData));
+                localStorage.setItem(STORAGE_KEYS.effortData, JSON.stringify(effortData));
+                showSaveIndicator();
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
+        }
+
+        // Show save indicator
+        function showSaveIndicator() {
+            let indicator = document.getElementById('saveIndicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.id = 'saveIndicator';
+                indicator.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: var(--success); color: white; padding: 0.75rem 1.25rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; z-index: 9999; opacity: 0; transition: opacity 0.3s; display: flex; align-items: center; gap: 0.5rem;';
+                indicator.innerHTML = '<span style="font-size: 1.1rem;">✓</span> Changes saved';
+                document.body.appendChild(indicator);
+            }
+            indicator.style.opacity = '1';
+            setTimeout(() => indicator.style.opacity = '0', 2000);
+        }
+
+        // Reset to original data from JSON files
+        async function resetToOriginal() {
+            if (!confirm('This will discard all your changes and reload the original data. Continue?')) return;
+            localStorage.removeItem(STORAGE_KEYS.sprintData);
+            localStorage.removeItem(STORAGE_KEYS.effortData);
+            await loadFromServer();
+            initializeApp();
+            showResetIndicator();
+        }
+
+        function showResetIndicator() {
+            let indicator = document.getElementById('saveIndicator');
+            if (indicator) {
+                indicator.innerHTML = '<span style="font-size: 1.1rem;">↺</span> Data reset to original';
+                indicator.style.background = 'var(--warning)';
+                indicator.style.opacity = '1';
+                setTimeout(() => {
+                    indicator.style.opacity = '0';
+                    indicator.style.background = 'var(--success)';
+                    indicator.innerHTML = '<span style="font-size: 1.1rem;">✓</span> Changes saved';
+                }, 2000);
+            }
+        }
+
+        // Load from server JSON files
+        async function loadFromServer() {
+            const [sprintResponse, effortResponse] = await Promise.all([
+                fetch('sprint_plan.json'),
+                fetch('effort_data.json')
+            ]);
+            sprintData = await sprintResponse.json();
+            effortData = await effortResponse.json();
+        }
+
+        async function loadData() {
+            try {
+                // Check localStorage first
+                const savedSprintData = localStorage.getItem(STORAGE_KEYS.sprintData);
+                const savedEffortData = localStorage.getItem(STORAGE_KEYS.effortData);
+
+                if (savedSprintData && savedEffortData) {
+                    // Load from localStorage
+                    sprintData = JSON.parse(savedSprintData);
+                    effortData = JSON.parse(savedEffortData);
+                    console.log('Loaded data from localStorage');
+                } else {
+                    // Load from server
+                    await loadFromServer();
+                    console.log('Loaded data from server');
+                }
+                initializeApp();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('sprintCardsGrid').innerHTML = '<p style="color: var(--text-muted);">Error loading data.</p>';
+            }
+        }
+
+        function initializeApp() {
+            updateStats();
+            renderOverview();
+            renderKanban();
+            renderEffort();
+            renderRoadmap();
+            renderTimeline();
+            setupDragAndDrop();
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.view-container').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(view + '-view').classList.add('active');
+        }
+
+        function updateStats() {
+            const tasks = sprintData.filter(t => t.Type === 'Task');
+            const completed = tasks.filter(t => t.Status === 'Completed').length;
+            const inProgress = tasks.filter(t => t.Status === 'In Progress' || t.Status === 'In progress').length;
+            const notStarted = tasks.filter(t => t.Status === 'Not Started' || !t.Status).length;
+
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('inProgressTasks').textContent = inProgress;
+            document.getElementById('notStartedTasks').textContent = notStarted;
+            document.getElementById('completionRate').textContent = tasks.length > 0 ? Math.round(completed / tasks.length * 100) + '%' : '0%';
+        }
+
+        function renderOverview() {
+            const grid = document.getElementById('sprintCardsGrid');
+            const sprints = [...new Set(sprintData.map(t => t.Sprint).filter(s => s !== null))].sort((a, b) => a - b);
+
+            grid.innerHTML = sprints.map(sprintNum => {
+                const sprintTasks = sprintData.filter(t => t.Sprint === sprintNum);
+                const tasks = sprintTasks.filter(t => t.Type === 'Task');
+                const milestone = sprintTasks.find(t => t.Type === 'Milestone');
+                const completed = tasks.filter(t => t.Status === 'Completed').length;
+                const progress = tasks.length > 0 ? Math.round(completed / tasks.length * 100) : 0;
+
+                const circumference = 2 * Math.PI * 34;
+                const offset = circumference - (progress / 100 * circumference);
+                const colors = getSprintColors(sprintNum);
+
+                return `
+                    <div class="sprint-card" onclick="openSprintDetail(${sprintNum})">
+                        <div class="sprint-card-header">
+                            <div>
+                                <span class="sprint-badge sprint-${sprintNum}">Sprint ${sprintNum}</span>
+                                <h3 class="sprint-title">${milestone ? escapeHtml(milestone.Description.substring(0, 40)) : 'Sprint ' + sprintNum}</h3>
+                                <p class="sprint-dates">${tasks.length} tasks</p>
+                            </div>
+                            <div class="progress-ring-container">
+                                <svg class="progress-ring" width="80" height="80">
+                                    <circle class="progress-ring-bg" cx="40" cy="40" r="34"/>
+                                    <circle class="progress-ring-fill" cx="40" cy="40" r="34" stroke="${colors[0]}" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"/>
+                                </svg>
+                                <span class="progress-ring-text">${progress}%</span>
+                            </div>
+                        </div>
+                        <div class="task-mini-list">
+                            ${tasks.slice(0, 3).map(t => `
+                                <div class="task-mini">
+                                    <div class="task-mini-dot ${getStatusClass(t.Status)}"></div>
+                                    <span class="task-mini-text">${escapeHtml(t.Description)}</span>
+                                </div>
+                            `).join('')}
+                            ${tasks.length > 3 ? `<div class="task-mini" style="color: var(--accent);">+${tasks.length - 3} more</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getSprintColors(num) {
+            const colors = { 0: ['#8b5cf6'], 1: ['#3b82f6'], 2: ['#10b981'], 3: ['#f59e0b'], 4: ['#ef4444'], 5: ['#ec4899'], 9: ['#06b6d4'], 10: ['#84cc16'], 11: ['#f97316'], 12: ['#6366f1'] };
+            return colors[num] || ['#8b5cf6'];
+        }
+
+        function getStatusClass(status) {
+            if (status === 'Completed') return 'completed';
+            if (status === 'In Progress' || status === 'In progress') return 'in-progress';
+            return 'not-started';
+        }
+
+        // Sprint Detail Panel
+        function openSprintDetail(sprintNum) {
+            currentSprintNum = sprintNum;
+            const sprintTasks = sprintData.filter(t => t.Sprint === sprintNum);
+            const tasks = sprintTasks.filter(t => t.Type === 'Task');
+            const milestone = sprintTasks.find(t => t.Type === 'Milestone');
+
+            const completed = tasks.filter(t => t.Status === 'Completed').length;
+            const inProgress = tasks.filter(t => t.Status === 'In Progress' || t.Status === 'In progress').length;
+            const notStarted = tasks.filter(t => t.Status === 'Not Started' || !t.Status).length;
+            const progress = tasks.length > 0 ? Math.round(completed / tasks.length * 100) : 0;
+
+            document.getElementById('sprintDetailBadge').className = `sprint-badge sprint-${sprintNum}`;
+            document.getElementById('sprintDetailBadge').textContent = `Sprint ${sprintNum}`;
+            document.getElementById('sprintDetailName').textContent = milestone ? milestone.Description : `Sprint ${sprintNum}`;
+            document.getElementById('sprintDetailMeta').textContent = `${tasks.length} tasks`;
+
+            document.getElementById('detailCompleted').textContent = completed;
+            document.getElementById('detailInProgress').textContent = inProgress;
+            document.getElementById('detailNotStarted').textContent = notStarted;
+            document.getElementById('detailProgress').textContent = progress + '%';
+            document.getElementById('detailProgressBar').style.width = progress + '%';
+
+            renderSprintDetailTasks(sprintNum);
+            document.getElementById('sprintDetailOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSprintDetail() {
+            document.getElementById('sprintDetailOverlay').classList.remove('show');
+            document.body.style.overflow = '';
+            currentSprintNum = null;
+            renderOverview();
+            updateStats();
+        }
+
+        function renderSprintDetailTasks(sprintNum) {
+            const container = document.getElementById('sprintDetailTasks');
+            // Only show tasks, not milestones (milestone is the sprint title)
+            const tasks = sprintData.filter(t => t.Sprint === sprintNum && t.Type === 'Task');
+
+            if (tasks.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--text-muted);">No tasks in this sprint</p>';
+                return;
+            }
+
+            container.innerHTML = tasks.map(task => {
+                const globalIndex = sprintData.indexOf(task);
+                const statusClass = getStatusClass(task.Status);
+
+                return `
+                    <div class="detail-task-card" id="task-card-${globalIndex}">
+                        <div class="detail-task-header" onclick="toggleTaskExpand(${globalIndex})">
+                            <div class="detail-task-status ${statusClass}"></div>
+                            <div class="detail-task-info">
+                                <div class="detail-task-name">${escapeHtml(task.Description)}</div>
+                                <div class="detail-task-meta">
+                                    ${task.Start_Date && task.Start_Date !== 'TBD' ? `<span>${formatDate(task.Start_Date)}</span>` : ''}
+                                    ${task.Duration ? `<span>${task.Duration}d</span>` : ''}
+                                    <span>${task.Status || 'Not Started'}</span>
+                                </div>
+                            </div>
+                            <button class="detail-task-expand" id="expand-btn-${globalIndex}">▼</button>
+                        </div>
+                        <div class="detail-task-body" id="task-body-${globalIndex}">
+                            <div class="detail-form-grid">
+                                <div class="detail-form-group full-width">
+                                    <label>Description</label>
+                                    <textarea onchange="updateTaskField(${globalIndex}, 'Description', this.value)">${escapeHtml(task.Description || '')}</textarea>
+                                </div>
+                                <div class="detail-form-group">
+                                    <label>Status</label>
+                                    <select onchange="updateTaskField(${globalIndex}, 'Status', this.value)">
+                                        <option value="Not Started" ${!task.Status || task.Status === 'Not Started' ? 'selected' : ''}>Not Started</option>
+                                        <option value="In Progress" ${task.Status === 'In Progress' || task.Status === 'In progress' ? 'selected' : ''}>In Progress</option>
+                                        <option value="On Track" ${task.Status === 'On Track' ? 'selected' : ''}>On Track</option>
+                                        <option value="Completed" ${task.Status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                    </select>
+                                </div>
+                                <div class="detail-form-group">
+                                    <label>Start Date</label>
+                                    <input type="date" value="${task.Start_Date && task.Start_Date !== 'TBD' ? task.Start_Date : ''}" onchange="updateTaskField(${globalIndex}, 'Start_Date', this.value)">
+                                </div>
+                                <div class="detail-form-group">
+                                    <label>End Date</label>
+                                    <input type="date" value="${task.End_Date && task.End_Date !== 'TBD' ? task.End_Date : ''}" onchange="updateTaskField(${globalIndex}, 'End_Date', this.value)">
+                                </div>
+                                <div class="detail-form-group">
+                                    <label>Duration (Days)</label>
+                                    <input type="number" min="1" value="${task.Duration || ''}" onchange="updateTaskField(${globalIndex}, 'Duration', parseInt(this.value) || null)">
+                                </div>
+                            </div>
+                            <div class="detail-task-actions">
+                                <button class="btn btn-danger btn-sm" onclick="deleteTask(${globalIndex})">Delete</button>
+                                <button class="btn btn-secondary btn-sm" onclick="duplicateTask(${globalIndex})">Duplicate</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleTaskExpand(index) {
+            const body = document.getElementById(`task-body-${index}`);
+            const btn = document.getElementById(`expand-btn-${index}`);
+            const card = document.getElementById(`task-card-${index}`);
+            const isExpanded = body.classList.contains('show');
+
+            document.querySelectorAll('.detail-task-body.show').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('.detail-task-card.expanded').forEach(el => el.classList.remove('expanded'));
+            document.querySelectorAll('.detail-task-expand.expanded').forEach(el => el.classList.remove('expanded'));
+
+            if (!isExpanded) {
+                body.classList.add('show');
+                card.classList.add('expanded');
+                btn.classList.add('expanded');
+            }
+        }
+
+        function updateTaskField(index, field, value) {
+            if (sprintData[index]) {
+                sprintData[index][field] = value;
+                if (field === 'Status') {
+                    updateSprintDetailProgress();
+                    const statusEl = document.querySelector(`#task-card-${index} .detail-task-status`);
+                    if (statusEl) statusEl.className = 'detail-task-status ' + getStatusClass(value);
+                }
+                if (field === 'Description') {
+                    const nameEl = document.querySelector(`#task-card-${index} .detail-task-name`);
+                    if (nameEl) nameEl.textContent = value;
+                }
+                saveData(); // Auto-save changes
+            }
+        }
+
+        function updateSprintDetailProgress() {
+            if (currentSprintNum === null) return;
+            const tasks = sprintData.filter(t => t.Sprint === currentSprintNum && t.Type === 'Task');
+            const completed = tasks.filter(t => t.Status === 'Completed').length;
+            const inProgress = tasks.filter(t => t.Status === 'In Progress' || t.Status === 'In progress').length;
+            const notStarted = tasks.filter(t => t.Status === 'Not Started' || !t.Status).length;
+            const progress = tasks.length > 0 ? Math.round(completed / tasks.length * 100) : 0;
+
+            document.getElementById('detailCompleted').textContent = completed;
+            document.getElementById('detailInProgress').textContent = inProgress;
+            document.getElementById('detailNotStarted').textContent = notStarted;
+            document.getElementById('detailProgress').textContent = progress + '%';
+            document.getElementById('detailProgressBar').style.width = progress + '%';
+        }
+
+        function deleteTask(index) {
+            if (confirm('Delete this task?')) {
+                sprintData.splice(index, 1);
+                renderSprintDetailTasks(currentSprintNum);
+                updateSprintDetailProgress();
+                saveData(); // Auto-save changes
+            }
+        }
+
+        function duplicateTask(index) {
+            const task = sprintData[index];
+            if (task) {
+                sprintData.push({ ...task, Description: task.Description + ' (Copy)' });
+                renderSprintDetailTasks(currentSprintNum);
+                saveData(); // Auto-save changes
+            }
+        }
+
+        function addTaskToSprint() {
+            if (currentSprintNum === null) return;
+            sprintData.push({ Sprint: currentSprintNum, Type: 'Task', Description: 'New Task', Status: 'Not Started', Start_Date: null, End_Date: null, Duration: null, Progress: 0 });
+            renderSprintDetailTasks(currentSprintNum);
+            updateSprintDetailProgress();
+            saveData(); // Auto-save changes
+        }
+
+        document.getElementById('sprintDetailOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeSprintDetail();
+        });
+
+        // Kanban
+        function renderKanban() {
+            const columns = {
+                'Not Started': document.getElementById('kanban-not-started'),
+                'In Progress': document.getElementById('kanban-in-progress'),
+                'On Track': document.getElementById('kanban-on-track'),
+                'Completed': document.getElementById('kanban-completed')
+            };
+
+            Object.values(columns).forEach(col => col.innerHTML = '');
+            const counts = { 'Not Started': 0, 'In Progress': 0, 'On Track': 0, 'Completed': 0 };
+
+            sprintData.filter(t => t.Type === 'Task').forEach(task => {
+                let status = task.Status || 'Not Started';
+                if (status === 'In progress') status = 'In Progress';
+                if (!columns[status]) status = 'Not Started';
+                counts[status]++;
+
+                const div = document.createElement('div');
+                div.className = 'kanban-task';
+                div.draggable = true;
+                div.dataset.index = sprintData.indexOf(task);
+                div.innerHTML = `
+                    <span class="kanban-task-sprint sprint-${task.Sprint}">Sprint ${task.Sprint}</span>
+                    <div class="kanban-task-title">${escapeHtml(task.Description)}</div>
+                    <div class="kanban-task-meta">
+                        ${task.Duration ? `<span>${task.Duration}d</span>` : ''}
+                        ${task.Start_Date && task.Start_Date !== 'TBD' ? `<span>${formatDate(task.Start_Date)}</span>` : ''}
+                    </div>
+                `;
+                columns[status].appendChild(div);
+            });
+
+            document.getElementById('kanban-not-started-count').textContent = counts['Not Started'];
+            document.getElementById('kanban-in-progress-count').textContent = counts['In Progress'];
+            document.getElementById('kanban-on-track-count').textContent = counts['On Track'];
+            document.getElementById('kanban-completed-count').textContent = counts['Completed'];
+        }
+
+        let draggedElement = null;
+        let dragPreview = null;
+        let placeholder = null;
+
+        function setupDragAndDrop() {
+            document.querySelectorAll('.kanban-task').forEach(task => {
+                task.addEventListener('dragstart', handleDragStart);
+                task.addEventListener('dragend', handleDragEnd);
+            });
+
+            document.querySelectorAll('.kanban-column').forEach(column => {
+                column.addEventListener('dragover', handleDragOver);
+                column.addEventListener('dragleave', handleDragLeave);
+                column.addEventListener('drop', handleDrop);
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.dataTransfer.setData('text/plain', e.target.dataset.index);
+            e.dataTransfer.effectAllowed = 'move';
+            
+            // Create custom drag preview
+            dragPreview = draggedElement.cloneNode(true);
+            dragPreview.classList.add('drag-preview');
+            dragPreview.style.width = draggedElement.offsetWidth + 'px';
+            document.body.appendChild(dragPreview);
+            
+            // Hide default drag image
+            const emptyImg = new Image();
+            emptyImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            e.dataTransfer.setDragImage(emptyImg, 0, 0);
+            
+            // Mark original as dragging after a tiny delay
+            setTimeout(() => {
+                draggedElement.classList.add('dragging');
+            }, 0);
+            
+            // Track mouse for custom preview
+            document.addEventListener('dragover', moveDragPreview);
+        }
+
+        function moveDragPreview(e) {
+            if (dragPreview) {
+                dragPreview.style.left = (e.clientX - dragPreview.offsetWidth / 2) + 'px';
+                dragPreview.style.top = (e.clientY - 20) + 'px';
+            }
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            
+            // Clean up preview
+            if (dragPreview) {
+                dragPreview.remove();
+                dragPreview = null;
+            }
+            
+            // Clean up placeholder
+            if (placeholder) {
+                placeholder.remove();
+                placeholder = null;
+            }
+            
+            // Remove drag-over from all columns
+            document.querySelectorAll('.kanban-column').forEach(col => {
+                col.classList.remove('drag-over');
+            });
+            
+            document.removeEventListener('dragover', moveDragPreview);
+            draggedElement = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const column = e.target.closest('.kanban-column');
+            if (!column) return;
+            
+            // Add visual feedback to column
+            document.querySelectorAll('.kanban-column').forEach(col => {
+                col.classList.remove('drag-over');
+            });
+            column.classList.add('drag-over');
+            
+            // Show placeholder
+            const tasksContainer = column.querySelector('.kanban-tasks');
+            if (!placeholder) {
+                placeholder = document.createElement('div');
+                placeholder.className = 'drop-placeholder';
+            }
+            
+            // Find position to insert placeholder
+            const afterElement = getDragAfterElement(tasksContainer, e.clientY);
+            if (afterElement) {
+                tasksContainer.insertBefore(placeholder, afterElement);
+            } else {
+                tasksContainer.appendChild(placeholder);
+            }
+        }
+
+        function handleDragLeave(e) {
+            const column = e.target.closest('.kanban-column');
+            if (!column) return;
+            
+            // Only remove if actually leaving the column
+            const rect = column.getBoundingClientRect();
+            if (e.clientX < rect.left || e.clientX > rect.right || 
+                e.clientY < rect.top || e.clientY > rect.bottom) {
+                column.classList.remove('drag-over');
+                if (placeholder && placeholder.parentNode === column.querySelector('.kanban-tasks')) {
+                    placeholder.remove();
+                }
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            
+            const column = e.target.closest('.kanban-column');
+            if (!column) return;
+            
+            const index = e.dataTransfer.getData('text/plain');
+            const newStatus = column.dataset.status;
+            
+            if (sprintData[index]) {
+                sprintData[index].Status = newStatus;
+                
+                // Clean up
+                if (placeholder) {
+                    placeholder.remove();
+                    placeholder = null;
+                }
+                column.classList.remove('drag-over');
+                
+                updateStats();
+                renderKanban();
+                renderOverview();
+                saveData(); // Auto-save changes
+                
+                // Add drop animation to the newly placed card
+                setTimeout(() => {
+                    const newCard = document.querySelector(`.kanban-task[data-index="${index}"]`);
+                    if (newCard) {
+                        newCard.classList.add('dropping');
+                        setTimeout(() => newCard.classList.remove('dropping'), 300);
+                    }
+                    setupDragAndDrop();
+                }, 10);
+            }
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.kanban-task:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // Effort & Resources
+        function renderEffort() {
+            if (!effortData) return;
+
+            const summary = effortData.summary;
+            const modules = effortData.modules;
+
+            // Summary cards
+            document.getElementById('effortSummary').innerHTML = `
+                <div class="effort-summary-card">
+                    <div class="big-number">${summary.total_hours.toLocaleString()}</div>
+                    <div class="label">Total Hours</div>
+                </div>
+                <div class="effort-summary-card fe">
+                    <div class="big-number">${summary.total_fe_hours.toLocaleString()}</div>
+                    <div class="label">Frontend Hours</div>
+                </div>
+                <div class="effort-summary-card be">
+                    <div class="big-number">${summary.total_be_hours.toLocaleString()}</div>
+                    <div class="label">Backend Hours</div>
+                </div>
+                <div class="effort-summary-card">
+                    <div class="big-number" style="display: flex; gap: 0.5rem; justify-content: center; align-items: baseline;">
+                        <span style="color: var(--info);">${summary.fe_resources}</span>
+                        <span style="font-size: 1rem; color: var(--text-muted);">FE</span>
+                        <span style="color: var(--text-muted); font-size: 1rem;">/</span>
+                        <span style="color: var(--purple);">${summary.be_resources}</span>
+                        <span style="font-size: 1rem; color: var(--text-muted);">BE</span>
+                    </div>
+                    <div class="label">Team Members</div>
+                </div>
+                <div class="effort-summary-card">
+                    <div class="big-number">${summary.total_weeks}</div>
+                    <div class="label">Weeks Timeline</div>
+                </div>
+            `;
+
+            // Module cards - simple percentage-based composition (FE vs BE)
+            document.getElementById('moduleCards').innerHTML = modules.map(mod => {
+                const totalHours = mod.total_fe + mod.total_be;
+                const fePercent = (mod.total_fe / totalHours) * 100;
+                const bePercent = (mod.total_be / totalHours) * 100;
+                const weekRange = mod.start_week ? (mod.start_week === mod.end_week ? `Week ${mod.start_week}` : `Week ${mod.start_week}-${mod.end_week}`) : '';
+
+                return `
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-name">${escapeHtml(mod.module)}</div>
+                                <div class="module-sprints">
+                                    ${weekRange ? `<span style="color: var(--accent); font-weight: 600;">${weekRange}</span>` : ''}
+                                    ${weekRange && mod.fe_sprint ? ' · ' : ''}
+                                    ${mod.fe_sprint ? `<span style="color: var(--info);">FE: Sprint ${mod.fe_sprint}</span>` : ''}
+                                    ${mod.fe_sprint && mod.be_sprint ? ' · ' : ''}
+                                    ${mod.be_sprint ? `<span style="color: var(--purple);">BE: Sprint ${mod.be_sprint}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="module-total">
+                                <div class="hours">${totalHours}</div>
+                                <div class="hours-label">total hours</div>
+                            </div>
+                        </div>
+                        <div class="module-stacked-bar-container">
+                            <div class="module-stacked-bar">
+                                ${mod.total_fe > 0 ? `<div class="stacked-seg fe" style="width: ${fePercent}%;" title="Frontend: ${mod.total_fe}h (${Math.round(fePercent)}%)">
+                                    <span>${mod.total_fe}h</span>
+                                </div>` : ''}
+                                ${mod.total_be > 0 ? `<div class="stacked-seg be" style="width: ${bePercent}%;" title="Backend: ${mod.total_be}h (${Math.round(bePercent)}%)">
+                                    <span>${mod.total_be}h</span>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Mini Gantt Chart - Interactive
+            const weeks = Array.from({length: 16}, (_, i) => i + 1);
+            // Include all modules except Buffer for Gantt editing
+            const ganttModules = modules.filter(m => m.module !== 'Buffer');
+            
+            // Initialize active_weeks arrays if not present
+            ganttModules.forEach((mod, idx) => {
+                if (!mod.active_weeks) {
+                    mod.active_weeks = [];
+                    if (mod.start_week && mod.end_week) {
+                        for (let w = mod.start_week; w <= mod.end_week; w++) {
+                            mod.active_weeks.push(w);
+                        }
+                    }
+                }
+            });
+            
+            document.getElementById('miniGantt').innerHTML = `
+                <div class="gantt-header">
+                    <div class="gantt-header-cell"></div>
+                    ${weeks.map(w => `<div class="gantt-header-cell">W${w}</div>`).join('')}
+                </div>
+                ${ganttModules.map((mod, modIdx) => {
+                    return `
+                        <div class="gantt-row" data-module-idx="${modIdx}">
+                            <div class="gantt-module-name" title="${escapeHtml(mod.module)}">${escapeHtml(mod.module)}</div>
+                            ${weeks.map(w => {
+                                const isActive = mod.active_weeks.includes(w);
+                                const prevActive = mod.active_weeks.includes(w - 1);
+                                const nextActive = mod.active_weeks.includes(w + 1);
+                                let cellClass = 'gantt-cell';
+                                if (isActive) {
+                                    cellClass += ' active';
+                                    if (!prevActive && !nextActive) cellClass += ' active-single';
+                                    else if (!prevActive) cellClass += ' active-start';
+                                    else if (!nextActive) cellClass += ' active-end';
+                                }
+                                return `<div class="${cellClass}" data-week="${w}" data-module="${modIdx}" onclick="toggleGanttCell(${modIdx}, ${w}, this)"></div>`;
+                            }).join('')}
+                        </div>
+                    `;
+                }).join('')}
+                <div style="margin-top: 0.75rem; font-size: 0.7rem; color: var(--text-muted); text-align: center;">
+                    Click any cell to toggle week on/off
+                </div>
+            `;
+            
+            // Store gantt modules reference for toggle function
+            window.ganttModules = ganttModules;
+
+            // Sprint Workload - calculate hours per sprint
+            const sprintHours = {};
+            for (let s = 1; s <= 8; s++) {
+                sprintHours[s] = { fe: 0, be: 0 };
+            }
+            
+            modules.forEach(mod => {
+                if (mod.fe_sprint) {
+                    const sprints = mod.fe_sprint.split(',').map(s => parseInt(s.trim()));
+                    const hoursPerSprint = mod.total_fe / sprints.length;
+                    sprints.forEach(s => {
+                        if (sprintHours[s]) sprintHours[s].fe += hoursPerSprint;
+                    });
+                }
+                if (mod.be_sprint) {
+                    const sprints = mod.be_sprint.split(',').map(s => parseInt(s.trim()));
+                    const hoursPerSprint = mod.total_be / sprints.length;
+                    sprints.forEach(s => {
+                        if (sprintHours[s]) sprintHours[s].be += hoursPerSprint;
+                    });
+                }
+            });
+
+            const maxSprintHours = Math.max(...Object.values(sprintHours).map(s => s.fe + s.be));
+            
+            document.getElementById('sprintWorkload').innerHTML = Object.entries(sprintHours).map(([sprint, hours]) => {
+                const total = hours.fe + hours.be;
+                const feHeight = (hours.fe / maxSprintHours) * 80; // 80px max
+                const beHeight = (hours.be / maxSprintHours) * 80;
+                return `
+                    <div class="workload-sprint">
+                        <div class="workload-bar-container">
+                            <div class="workload-bar">
+                                ${hours.be > 0 ? `<div class="workload-seg be" style="height: ${beHeight}px;" title="BE: ${Math.round(hours.be)}h"></div>` : ''}
+                                ${hours.fe > 0 ? `<div class="workload-seg fe" style="height: ${feHeight}px;" title="FE: ${Math.round(hours.fe)}h"></div>` : ''}
+                            </div>
+                        </div>
+                        <div class="workload-label">Sprint ${sprint}</div>
+                        <div class="workload-hours">${Math.round(total)}h</div>
+                    </div>
+                `;
+            }).join('');
+
+            // Hours breakdown (FE vs BE only)
+            const fePct = (summary.total_fe_hours / summary.total_hours * 100).toFixed(0);
+            const bePct = (summary.total_be_hours / summary.total_hours * 100).toFixed(0);
+
+            document.getElementById('hoursBreakdown').innerHTML = `
+                <div class="hours-row">
+                    <div class="hours-color fe"></div>
+                    <div class="hours-type">Frontend (incl. Design)</div>
+                    <div class="hours-value">${summary.total_fe_hours.toLocaleString()}h</div>
+                </div>
+                <div class="hours-row">
+                    <div class="hours-color be"></div>
+                    <div class="hours-type">Backend</div>
+                    <div class="hours-value">${summary.total_be_hours.toLocaleString()}h</div>
+                </div>
+                <div class="stacked-bar">
+                    <div class="stacked-segment fe" style="width: ${fePct}%">${fePct}%</div>
+                    <div class="stacked-segment be" style="width: ${bePct}%">${bePct}%</div>
+                </div>
+                <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">
+                    ${summary.timeline}
+                </div>
+            `;
+        }
+
+        // Roadmap
+        function renderRoadmap() {
+            const container = document.getElementById('roadmapSprints');
+            const sprints = [...new Set(sprintData.map(t => t.Sprint).filter(s => s !== null))].sort((a, b) => a - b);
+
+            let totalCompleted = 0;
+            let totalSprints = sprints.length;
+
+            container.innerHTML = sprints.map(sprintNum => {
+                const tasks = sprintData.filter(t => t.Sprint === sprintNum && t.Type === 'Task');
+                const milestone = sprintData.find(t => t.Sprint === sprintNum && t.Type === 'Milestone');
+                const completed = tasks.filter(t => t.Status === 'Completed').length;
+                const inProgress = tasks.filter(t => t.Status === 'In Progress' || t.Status === 'In progress').length;
+                const progress = tasks.length > 0 ? Math.round(completed / tasks.length * 100) : 0;
+
+                const isCompleted = progress === 100;
+                const isInProgress = !isCompleted && (inProgress > 0 || completed > 0);
+                let nodeClass = isCompleted ? 'completed' : isInProgress ? 'in-progress' : '';
+                
+                if (isCompleted) totalCompleted++;
+
+                const statusColor = isCompleted ? 'var(--success)' : isInProgress ? 'var(--info)' : 'var(--border)';
+                const milestoneName = milestone ? milestone.Description : 'Sprint ' + sprintNum;
+
+                return `
+                    <div class="roadmap-sprint">
+                        <div class="roadmap-node ${nodeClass}" onclick="openSprintDetail(${sprintNum})">
+                            S${sprintNum}
+                        </div>
+                        <div class="roadmap-card" onclick="openSprintDetail(${sprintNum})">
+                            <div class="roadmap-card-header">
+                                <span class="sprint-badge sprint-${sprintNum}">Sprint ${sprintNum}</span>
+                            </div>
+                            <h4>${escapeHtml(milestoneName)}</h4>
+                            <div class="roadmap-card-meta">${tasks.length} tasks</div>
+                            <div class="roadmap-progress">
+                                <div class="roadmap-progress-bar" style="width: ${progress}%; background: ${statusColor};"></div>
+                            </div>
+                            <div class="roadmap-stats">
+                                <span>${completed} done</span>
+                                <span>${inProgress} active</span>
+                                <span>${progress}%</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update progress line
+            const progressPercent = totalSprints > 0 ? (totalCompleted / totalSprints) * 100 : 0;
+            document.getElementById('roadmapLineProgress').style.width = progressPercent + '%';
+        }
+
+        // Timeline
+        function renderTimeline() {
+            const container = document.getElementById('timelineContainer');
+            const sprints = [...new Set(sprintData.map(t => t.Sprint).filter(s => s !== null))].sort((a, b) => a - b);
+
+            let html = '<div class="timeline-line"></div>';
+            sprints.forEach(sprintNum => {
+                const sprintTasks = sprintData.filter(t => t.Sprint === sprintNum);
+                const milestone = sprintTasks.find(t => t.Type === 'Milestone');
+                const tasks = sprintTasks.filter(t => t.Type === 'Task');
+                const startDates = tasks.map(t => t.Start_Date).filter(d => d && d !== 'TBD');
+
+                html += `
+                    <div class="timeline-item" onclick="openSprintDetail(${sprintNum})" style="cursor: pointer;">
+                        <div class="timeline-dot ${milestone ? 'milestone' : ''}"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">
+                                <span class="sprint-badge sprint-${sprintNum}" style="font-size: 0.65rem; margin-right: 0.5rem;">Sprint ${sprintNum}</span>
+                                ${startDates.length > 0 ? formatDate(startDates[0]) : 'TBD'}
+                            </div>
+                            <h3 class="timeline-title">${milestone ? escapeHtml(milestone.Description) : 'Sprint ' + sprintNum}</h3>
+                            <p class="timeline-desc">${tasks.length} tasks</p>
+                            <div class="timeline-tasks">
+                                ${tasks.slice(0, 5).map(t => `
+                                    <span class="timeline-task-chip">
+                                        <span class="dot" style="background: var(--${getStatusClass(t.Status) === 'completed' ? 'success' : getStatusClass(t.Status) === 'in-progress' ? 'info' : 'warning'});"></span>
+                                        ${escapeHtml(t.Description.substring(0, 20))}${t.Description.length > 20 ? '...' : ''}
+                                    </span>
+                                `).join('')}
+                                ${tasks.length > 5 ? `<span class="timeline-task-chip" style="color: var(--accent);">+${tasks.length - 5}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr || dateStr === 'TBD') return 'TBD';
+            return new Date(dateStr).toLocaleDateString('en', { month: 'short', day: 'numeric' });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Toggle Gantt cell active state
+        function toggleGanttCell(modIdx, week, cellEl) {
+            const mod = window.ganttModules[modIdx];
+            if (!mod) return;
+            
+            const weekIdx = mod.active_weeks.indexOf(week);
+            if (weekIdx > -1) {
+                // Remove week
+                mod.active_weeks.splice(weekIdx, 1);
+            } else {
+                // Add week
+                mod.active_weeks.push(week);
+                mod.active_weeks.sort((a, b) => a - b);
+            }
+            
+            // Update start/end weeks in the original data
+            if (mod.active_weeks.length > 0) {
+                mod.start_week = Math.min(...mod.active_weeks);
+                mod.end_week = Math.max(...mod.active_weeks);
+            } else {
+                mod.start_week = null;
+                mod.end_week = null;
+            }
+            
+            // Re-render just this row for smooth visual update
+            const row = cellEl.closest('.gantt-row');
+            const cells = row.querySelectorAll('.gantt-cell');
+            
+            cells.forEach((cell, idx) => {
+                const w = idx + 1;
+                const isActive = mod.active_weeks.includes(w);
+                const prevActive = mod.active_weeks.includes(w - 1);
+                const nextActive = mod.active_weeks.includes(w + 1);
+                
+                cell.className = 'gantt-cell';
+                if (isActive) {
+                    cell.classList.add('active');
+                    if (!prevActive && !nextActive) cell.classList.add('active-single');
+                    else if (!prevActive) cell.classList.add('active-start');
+                    else if (!nextActive) cell.classList.add('active-end');
+                }
+            });
+            
+            // Add a subtle animation to the clicked cell
+            cellEl.style.transform = 'scale(1.2)';
+            setTimeout(() => cellEl.style.transform = '', 150);
+            
+            // Update the module card's week display
+            updateModuleCardWeeks(modIdx, mod);
+        }
+        
+        function updateModuleCardWeeks(modIdx, mod) {
+            // Find and update the corresponding module card
+            const moduleCards = document.querySelectorAll('.module-card');
+            const originalMod = effortData.modules.find(m => m.module === mod.module);
+            if (originalMod) {
+                originalMod.start_week = mod.start_week;
+                originalMod.end_week = mod.end_week;
+                originalMod.active_weeks = [...mod.active_weeks];
+            }
+            // Auto-save changes
+            saveData();
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
