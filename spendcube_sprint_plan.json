@@ -1,0 +1,233 @@
+[
+  {
+    "Sprint": 1,
+    "Type": "Milestone",
+    "Description": "Discovery & Architecture Baseline",
+    "Status": "In Progress",
+    "Start_Date": "2026-01-27",
+    "End_Date": "2026-02-09",
+    "Duration": 14,
+    "Progress": 0,
+    "Comments": null
+  },
+  {
+    "Sprint": 1,
+    "Type": "Task",
+    "Description": "CE codebase repository access & technical review",
+    "Status": "Completed",
+    "Start_Date": "2026-01-27",
+    "End_Date": "2026-01-28",
+    "Duration": 2,
+    "Progress": 1.0,
+    "Comments": "CE codebase access confirmation & architectural familiarity"
+  },
+  {
+    "Sprint": 1,
+    "Type": "Task",
+    "Description": "Local development environment setup & validation",
+    "Status": "Completed",
+    "Start_Date": "2026-01-27",
+    "End_Date": "2026-01-30",
+    "Duration": 4,
+    "Progress": 1.0,
+    "Comments": "Validated and documented local development environment"
+  },
+  {
+    "Sprint": 1,
+    "Type": "Task",
+    "Description": "UX discovery, design, and review for new application",
+    "Status": "In Progress",
+    "Start_Date": "2026-01-27",
+    "End_Date": "2026-02-08",
+    "Duration": 13,
+    "Progress": 0.7,
+    "Comments": "UX design baseline & reviewed wireframes. Next step: Fiona/Nick to review and sign off"
+  },
+  {
+    "Sprint": 1,
+    "Type": "Task",
+    "Description": "Sample page to perfom api call and DB insert",
+    "Status": "Completed",
+    "Start_Date": "2026-01-27",
+    "End_Date": "2026-02-05",
+    "Duration": 10,
+    "Progress": 1.0,
+    "Comments": null
+  },
+  {
+    "Sprint": 1,
+    "Type": "Task",
+    "Description": "Feature and workflow documentation",
+    "Status": "In Progress",
+    "Start_Date": "2026-02-02",
+    "End_Date": null,
+    "Duration": null,
+    "Progress": 0.2,
+    "Comments": "Creation of comprehensive wiki document"
+  },
+  {
+    "Sprint": 2,
+    "Type": "Milestone",
+    "Description": "Platform Foundation Setup and Backend & API Alignment",
+    "Status": "Not Started",
+    "Start_Date": "2026-02-10",
+    "End_Date": "2026-02-23",
+    "Duration": 14,
+    "Progress": 0,
+    "Comments": null
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Reports page",
+    "Status": "Not Started",
+    "Start_Date": "2026-02-10",
+    "End_Date": "2026-02-12",
+    "Duration": 3,
+    "Progress": 0.0,
+    "Comments": "Includes multiple API integration"
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "User flow: one tab - Your reports",
+    "Status": "Not Started",
+    "Start_Date": null,
+    "End_Date": null,
+    "Duration": null,
+    "Progress": 0.0,
+    "Comments": null
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Admin flow : two tabs \u2014 Your Reports and All Reports",
+    "Status": "Not Started",
+    "Start_Date": null,
+    "End_Date": null,
+    "Duration": null,
+    "Progress": 0.0,
+    "Comments": null
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Create New Report flow",
+    "Status": "Not Started",
+    "Start_Date": "2026-02-13",
+    "End_Date": "2026-02-20",
+    "Duration": 6,
+    "Progress": 0.0,
+    "Comments": "Includes multiple API integration"
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Additional Info form",
+    "Status": "Not Started",
+    "Start_Date": null,
+    "End_Date": null,
+    "Duration": null,
+    "Progress": 0.0,
+    "Comments": null
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Upload Files",
+    "Status": "Not Started",
+    "Start_Date": null,
+    "End_Date": null,
+    "Duration": null,
+    "Progress": 0.0,
+    "Comments": null
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Data Validation steps (without column mapping)",
+    "Status": "Not Started",
+    "Start_Date": null,
+    "End_Date": null,
+    "Duration": null,
+    "Progress": 0.0,
+    "Comments": null
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Additional Info and App startup service",
+    "Status": "Not Started",
+    "Start_Date": "2026-02-10",
+    "End_Date": "2026-02-11",
+    "Duration": 1,
+    "Progress": 0.0,
+    "Comments": "Startup service API integration ,Cosmos db entry,Container creation"
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Upload API configuration",
+    "Status": "Not Started",
+    "Start_Date": "2026-02-12",
+    "End_Date": "2026-02-16",
+    "Duration": 3,
+    "Progress": 0.0,
+    "Comments": "Configure the exsisting api with Spend app ,entry in respective collection in cosmos db,"
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Column mapping databricks job",
+    "Status": "Not Started",
+    "Start_Date": "2026-02-10",
+    "End_Date": "2026-02-12",
+    "Duration": 3,
+    "Progress": 0.0,
+    "Comments": "mapping code development in databricks, parallel processing flow for multiple file uploads, entry to cosmos db"
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Normalisation databricks job",
+    "Status": "Not Started",
+    "Start_Date": "2026-02-10",
+    "End_Date": "2026-02-13",
+    "Duration": 4,
+    "Progress": 0.0,
+    "Comments": "merging of multiple spend file ,normalisation code development in databricks notebook,metadata entry to cosmos db ,testing for large files"
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Databrick job triggering API integration",
+    "Status": "Not Started",
+    "Start_Date": "2026-02-13",
+    "End_Date": "2026-02-16",
+    "Duration": 2,
+    "Progress": 0.0,
+    "Comments": "Triggering API configuration of data bricks job at respective time."
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "Taxonomy Creation databricks job",
+    "Status": "Not Started",
+    "Start_Date": "2026-02-10",
+    "End_Date": "2026-02-13",
+    "Duration": 4,
+    "Progress": 0.0,
+    "Comments": "Taxonomy craetion code development in databricks notebook"
+  },
+  {
+    "Sprint": 2,
+    "Type": "Task",
+    "Description": "API Integration with UI",
+    "Status": "Not Started",
+    "Start_Date": "2026-02-18",
+    "End_Date": "2026-02-20",
+    "Duration": 3,
+    "Progress": 0.0,
+    "Comments": "API integration with ui for respective features and testing"
+  }
+]

@@ -63,6 +63,53 @@
         .header h1 span { color: var(--accent); }
         .header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; }
 
+        .logo-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-dropdown select {
+            background: var(--bg-card);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 2.5rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffe600' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            transition: all 0.2s ease;
+        }
+
+        .logo-dropdown select:hover {
+            background: var(--bg-hover);
+            box-shadow: 0 0 12px rgba(255, 230, 0, 0.3);
+        }
+
+        .logo-dropdown select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 230, 0, 0.2);
+        }
+
+        .logo-dropdown select option {
+            background: var(--bg-card);
+            color: var(--accent);
+            padding: 0.75rem;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
         .nav-tabs { display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
 
         .nav-tab {
@@ -615,7 +662,13 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <h1><span>SynergEY.ai</span> User Stories</h1>
+            <div class="logo-dropdown">
+                <select id="projectSelector" onchange="switchProject(this.value)">
+                    <option value="synergey">SynergEY.ai</option>
+                    <option value="spendcube">SpendCube</option>
+                </select>
+                <span class="page-title">User Stories</span>
+            </div>
             <nav class="nav-tabs">
                 <a href="index.html" class="nav-tab active">User Stories</a>
                 <a href="sprint-planner.html" class="nav-tab">Sprint Timeline</a>
@@ -743,20 +796,56 @@
     </div>
 
     <script>
+        // Project configuration
+        const projects = {
+            synergey: {
+                name: 'SynergEY.ai',
+                userStoriesFile: 'user_stories.json',
+                sprintPlanFile: 'sprint_plan.json',
+                effortDataFile: 'effort_data.json'
+            },
+            spendcube: {
+                name: 'SpendCube',
+                userStoriesFile: 'spendcube_user_stories.json',
+                sprintPlanFile: 'spendcube_sprint_plan.json',
+                effortDataFile: 'spendcube_effort_data.json'
+            }
+        };
+
+        // Get current project from localStorage
+        function getCurrentProject() {
+            return localStorage.getItem('selectedProject') || 'synergey';
+        }
+
+        // Switch project
+        function switchProject(projectId) {
+            localStorage.setItem('selectedProject', projectId);
+            loadData();
+        }
+
+        // Initialize project selector
+        function initProjectSelector() {
+            const project = getCurrentProject();
+            document.getElementById('projectSelector').value = project;
+        }
+
         // User stories data will be loaded here
         let userStories = [];
         let filteredStories = [];
 
         // Load data from JSON file
         async function loadData() {
+            const project = getCurrentProject();
+            const config = projects[project];
+            
             try {
-                const response = await fetch('user_stories.json');
+                const response = await fetch(config.userStoriesFile);
                 userStories = await response.json();
                 initializeApp();
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('storiesTableBody').innerHTML = 
-                    '<tr><td colspan="8" class="empty-state"><h3>Error Loading Data</h3><p>Could not load user_stories.json. Please ensure the file exists.</p></td></tr>';
+                    '<tr><td colspan="8" class="empty-state"><h3>No User Stories</h3><p>No user stories available for ' + config.name + '.</p></td></tr>';
             }
         }
 
@@ -1132,6 +1221,7 @@
         }
 
         // Initialize
+        initProjectSelector();
         loadData();
     </script>
 </body>

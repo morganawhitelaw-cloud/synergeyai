@@ -1,0 +1,10 @@
+# Excel files (data already extracted to JSON)
+*.xlsx
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*~

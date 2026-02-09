@@ -56,6 +56,53 @@
         .header h1 { font-size: 1.4rem; font-weight: 600; }
         .header h1 span { color: var(--accent); }
 
+        .logo-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-dropdown select {
+            background: var(--bg-card);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 2.5rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffe600' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            transition: all 0.2s ease;
+        }
+
+        .logo-dropdown select:hover {
+            background: var(--bg-hover);
+            box-shadow: 0 0 12px rgba(255, 230, 0, 0.3);
+        }
+
+        .logo-dropdown select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 230, 0, 0.2);
+        }
+
+        .logo-dropdown select option {
+            background: var(--bg-card);
+            color: var(--accent);
+            padding: 0.75rem;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
         .nav-tabs { display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
 
         .nav-tab {
@@ -497,7 +544,13 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <h1><span>SynergEY.ai</span> Progress Report</h1>
+            <div class="logo-dropdown">
+                <select id="projectSelector" onchange="switchProject(this.value)">
+                    <option value="synergey">SynergEY.ai</option>
+                    <option value="spendcube">SpendCube</option>
+                </select>
+                <span class="page-title">Progress Report</span>
+            </div>
             <nav class="nav-tabs">
                 <a href="index.html" class="nav-tab">User Stories</a>
                 <a href="sprint-planner.html" class="nav-tab">Sprint Timeline</a>
@@ -650,15 +703,60 @@
     </div>
 
     <script>
+        // Project configuration
+        const projects = {
+            synergey: {
+                name: 'SynergEY.ai',
+                userStoriesFile: 'user_stories.json',
+                sprintPlanFile: 'sprint_plan.json',
+                effortDataFile: 'effort_data.json',
+                storagePrefix: 'synergey'
+            },
+            spendcube: {
+                name: 'SpendCube',
+                userStoriesFile: 'spendcube_user_stories.json',
+                sprintPlanFile: 'spendcube_sprint_plan.json',
+                effortDataFile: 'spendcube_effort_data.json',
+                storagePrefix: 'spendcube'
+            }
+        };
+
+        // Get current project from localStorage
+        function getCurrentProject() {
+            return localStorage.getItem('selectedProject') || 'synergey';
+        }
+
+        // Get storage keys for current project
+        function getStorageKeys() {
+            const project = getCurrentProject();
+            const prefix = projects[project].storagePrefix;
+            return {
+                sprintData: prefix + '_sprint_data',
+                effortData: prefix + '_effort_data'
+            };
+        }
+
+        // Switch project
+        function switchProject(projectId) {
+            localStorage.setItem('selectedProject', projectId);
+            location.reload();
+        }
+
+        // Initialize project selector
+        function initProjectSelector() {
+            const project = getCurrentProject();
+            document.getElementById('projectSelector').value = project;
+        }
+
         let sprintData = [];
         let effortData = null;
 
-        const STORAGE_KEYS = {
-            sprintData: 'synergey_sprint_data',
-            effortData: 'synergey_effort_data'
-        };
+        const STORAGE_KEYS = getStorageKeys();
 
         async function loadData() {
+            const project = getCurrentProject();
+            const config = projects[project];
+            
             try {
                 const savedSprintData = localStorage.getItem(STORAGE_KEYS.sprintData);
                 const savedEffortData = localStorage.getItem(STORAGE_KEYS.effortData);
@@ -668,8 +766,8 @@
                     effortData = JSON.parse(savedEffortData);
                 } else {
                     const [sprintResponse, effortResponse] = await Promise.all([
-                        fetch('sprint_plan.json'),
-                        fetch('effort_data.json')
+                        fetch(config.sprintPlanFile),
+                        fetch(config.effortDataFile)
                     ]);
                     sprintData = await sprintResponse.json();
                     effortData = await effortResponse.json();
@@ -716,14 +814,26 @@
             sprintRing.style.strokeDasharray = circumference;
             sprintRing.style.strokeDashoffset = circumference - (sprintPercent / 100) * circumference;
 
-            // Timeline Progress (estimate current week based on date)
-            const startDate = new Date('2025-01-05');
-            const endDate = new Date('2025-05-19');
-            const totalWeeks = 16;
+            // Calculate timeline from sprint data
+            const allDates = sprintData
+                .filter(t => t.Start_Date || t.End_Date)
+                .flatMap(t => [t.Start_Date, t.End_Date].filter(Boolean))
+                .map(d => new Date(d))
+                .filter(d => !isNaN(d));
+            
+            const startDate = allDates.length > 0 ? new Date(Math.min(...allDates)) : new Date();
+            const endDate = allDates.length > 0 ? new Date(Math.max(...allDates)) : new Date();
+            
             const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+            const totalWeeks = Math.max(1, Math.ceil((endDate - startDate) / msPerWeek));
             const elapsed = Math.max(0, today - startDate);
-            const currentWeek = Math.min(totalWeeks, Math.ceil(elapsed / msPerWeek));
+            const currentWeek = Math.min(totalWeeks, Math.max(1, Math.ceil(elapsed / msPerWeek)));
             const timelinePercent = Math.round((currentWeek / totalWeeks) * 100);
+            
+            // Format dates for display
+            const formatDate = (date) => {
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            };
             
             document.getElementById('timelinePercent').textContent = timelinePercent + '%';
             const timelineRing = document.getElementById('timelineRing');
@@ -739,8 +849,8 @@
             // Timeline bar
             document.getElementById('timelineElapsed').style.width = timelinePercent + '%';
             document.getElementById('currentWeek').textContent = `Week ${currentWeek} of ${totalWeeks}`;
-            document.getElementById('startDate').textContent = effortData?.summary?.timeline?.split(' - ')[0] || 'Jan 5th';
-            document.getElementById('endDate').textContent = effortData?.summary?.timeline?.split(' - ')[1] || 'May 19th';
+            document.getElementById('startDate').textContent = formatDate(startDate);
+            document.getElementById('endDate').textContent = formatDate(endDate);
 
             // Sprint List
             const sprintColors = ['#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#6366f1'];
@@ -836,6 +946,7 @@
             document.getElementById('risksList').innerHTML = risks.map(r => `<li>${r}</li>`).join('');
         }
 
+        initProjectSelector();
         loadData();
     </script>
 </body>

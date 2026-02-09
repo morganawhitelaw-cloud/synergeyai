@@ -54,6 +54,53 @@
         .header h1 { font-size: 1.4rem; font-weight: 600; }
         .header h1 span { color: var(--accent); }
 
+        .logo-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-dropdown select {
+            background: var(--bg-card);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 2.5rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffe600' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            transition: all 0.2s ease;
+        }
+
+        .logo-dropdown select:hover {
+            background: var(--bg-hover);
+            box-shadow: 0 0 12px rgba(255, 230, 0, 0.3);
+        }
+
+        .logo-dropdown select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 230, 0, 0.2);
+        }
+
+        .logo-dropdown select option {
+            background: var(--bg-card);
+            color: var(--accent);
+            padding: 0.75rem;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
         .nav-tabs { display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
 
         .nav-tab {
@@ -1091,7 +1138,13 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <h1><span>SynergEY.ai</span> Sprint Timeline</h1>
+            <div class="logo-dropdown">
+                <select id="projectSelector" onchange="switchProject(this.value)">
+                    <option value="synergey">SynergEY.ai</option>
+                    <option value="spendcube">SpendCube</option>
+                </select>
+                <span class="page-title">Sprint Timeline</span>
+            </div>
             <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                 <nav class="nav-tabs">
                     <a href="index.html" class="nav-tab">User Stories</a>
@@ -1242,15 +1295,57 @@
     </div>
 
     <script>
+        // Project configuration
+        const projects = {
+            synergey: {
+                name: 'SynergEY.ai',
+                userStoriesFile: 'user_stories.json',
+                sprintPlanFile: 'sprint_plan.json',
+                effortDataFile: 'effort_data.json',
+                storagePrefix: 'synergey'
+            },
+            spendcube: {
+                name: 'SpendCube',
+                userStoriesFile: 'spendcube_user_stories.json',
+                sprintPlanFile: 'spendcube_sprint_plan.json',
+                effortDataFile: 'spendcube_effort_data.json',
+                storagePrefix: 'spendcube'
+            }
+        };
+
+        // Get current project from localStorage
+        function getCurrentProject() {
+            return localStorage.getItem('selectedProject') || 'synergey';
+        }
+
+        // Get storage keys for current project
+        function getStorageKeys() {
+            const project = getCurrentProject();
+            const prefix = projects[project].storagePrefix;
+            return {
+                sprintData: prefix + '_sprint_data',
+                effortData: prefix + '_effort_data'
+            };
+        }
+
+        // Switch project
+        function switchProject(projectId) {
+            localStorage.setItem('selectedProject', projectId);
+            location.reload();
+        }
+
+        // Initialize project selector
+        function initProjectSelector() {
+            const project = getCurrentProject();
+            document.getElementById('projectSelector').value = project;
+        }
+
         let sprintData = [];
         let effortData = null;
         let currentSprintNum = null;
 
-        // LocalStorage keys
-        const STORAGE_KEYS = {
-            sprintData: 'synergey_sprint_data',
-            effortData: 'synergey_effort_data'
-        };
+        // LocalStorage keys (dynamic based on project)
+        const STORAGE_KEYS = getStorageKeys();
 
         // Save data to localStorage
         function saveData() {
@@ -1303,9 +1398,12 @@
 
         // Load from server JSON files
         async function loadFromServer() {
+            const project = getCurrentProject();
+            const config = projects[project];
+            
             const [sprintResponse, effortResponse] = await Promise.all([
-                fetch('sprint_plan.json'),
-                fetch('effort_data.json')
+                fetch(config.sprintPlanFile),
+                fetch(config.effortDataFile)
             ]);
             sprintData = await sprintResponse.json();
             effortData = await effortResponse.json();
@@ -2169,6 +2267,7 @@
             saveData();
         }
 
+        initProjectSelector();
         loadData();
     </script>
 </body>
