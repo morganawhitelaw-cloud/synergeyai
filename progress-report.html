@@ -766,6 +766,11 @@
         async function loadData() {
             const project = getCurrentProject();
             
+            // Clear previous data and unsubscribe
+            if (unsubscribe) unsubscribe();
+            sprintData = [];
+            effortData = null;
+            
             if (!project) {
                 showEmptyState();
                 return;
@@ -802,7 +807,6 @@
         // Real-time listener
         function setupRealtimeListener() {
             const project = getCurrentProject();
-            if (unsubscribe) unsubscribe();
             if (!project) return;
             
             unsubscribe = db.collection('projects').doc(project).onSnapshot((doc) => {

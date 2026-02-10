@@ -860,6 +860,11 @@
         async function loadData() {
             const project = getCurrentProject();
             
+            // Clear previous data and unsubscribe
+            if (unsubscribe) unsubscribe();
+            userStories = [];
+            filteredStories = [];
+            
             if (!project) {
                 showEmptyState();
                 return;
@@ -882,6 +887,16 @@
         }
         
         function showEmptyState() {
+            // Clear stats
+            userStories = [];
+            filteredStories = [];
+            document.getElementById('totalStories').textContent = '0';
+            document.getElementById('completedCount').textContent = '0';
+            document.getElementById('inProgressCount').textContent = '0';
+            document.getElementById('yetToStartCount').textContent = '0';
+            document.getElementById('highPriorityCount').textContent = '0';
+            document.getElementById('totalEffort').textContent = '0';
+            
             document.getElementById('storiesTableBody').innerHTML = `
                 <tr><td colspan="8" class="empty-state">
                     <h3>No User Stories</h3>
@@ -893,7 +908,6 @@
         // Real-time listener
         function setupRealtimeListener() {
             const project = getCurrentProject();
-            if (unsubscribe) unsubscribe();
             if (!project) return;
             
             unsubscribe = db.collection('projects').doc(project).onSnapshot((doc) => {

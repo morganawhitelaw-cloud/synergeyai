@@ -1412,6 +1412,11 @@
         async function loadData() {
             const project = getCurrentProject();
             
+            // Clear previous data and unsubscribe
+            if (unsubscribe) unsubscribe();
+            sprintData = [];
+            effortData = null;
+            
             if (!project) {
                 showEmptyState('No project selected. Create a new project or select one from the dropdown.');
                 return;
@@ -1448,7 +1453,6 @@
         // Real-time listener for live updates
         function setupRealtimeListener() {
             const project = getCurrentProject();
-            if (unsubscribe) unsubscribe();
             if (!project) return;
             
             unsubscribe = db.collection('projects').doc(project).onSnapshot((doc) => {
