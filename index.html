@@ -781,6 +781,55 @@
             cursor: not-allowed;
         }
 
+        /* Action Buttons in Table */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            padding: 0.35rem 0.6rem;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn.edit {
+            background: rgba(96, 165, 250, 0.2);
+            color: #60a5fa;
+        }
+
+        .action-btn.edit:hover {
+            background: rgba(96, 165, 250, 0.4);
+        }
+
+        .action-btn.complete {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+
+        .action-btn.complete:hover {
+            background: rgba(74, 222, 128, 0.4);
+        }
+
+        .action-btn.complete:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .action-btn.details {
+            background: rgba(255, 230, 0, 0.15);
+            color: var(--accent);
+        }
+
+        .action-btn.details:hover {
+            background: rgba(255, 230, 0, 0.3);
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -947,7 +996,7 @@
                 <h2>User Stories</h2>
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     <span class="result-count"><span id="filteredCount">0</span> stories</span>
-                    <button onclick="openAddStoryModal()" class="add-story-btn" id="addStoryBtn" style="display: none;">+ Add User Story</button>
+                    <button onclick="openAddStoryModal()" class="add-story-btn" id="addStoryBtn">+ Add User Story</button>
                 </div>
             </div>
             <div class="table-scroll">
@@ -1037,6 +1086,72 @@
         </div>
     </div>
 
+    <!-- Edit User Story Modal -->
+    <div class="modal-overlay" id="editStoryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Edit User Story</h2>
+                <button class="modal-close" onclick="closeEditStoryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editStoryId">
+                <div class="form-group">
+                    <label>User Story *</label>
+                    <textarea id="editStoryText" placeholder="As a [user type], I want [action] so that [benefit]..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Epic *</label>
+                        <input type="text" id="editStoryEpic" placeholder="e.g., User Authentication">
+                    </div>
+                    <div class="form-group">
+                        <label>Feature</label>
+                        <input type="text" id="editStoryFeature" placeholder="e.g., Login Flow">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="editStoryPriority">
+                            <option value="">Not Set</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="editStoryStatus">
+                            <option value="Yet to start">Yet to Start</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Sprint</label>
+                        <select id="editStorySprint">
+                            <option value="">Not Assigned</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Effort (hours)</label>
+                        <input type="number" id="editStoryEffort" value="8" min="1" max="200">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Acceptance Criteria</label>
+                    <textarea id="editStoryCriteria" placeholder="Define what 'done' looks like..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeEditStoryModal()">Cancel</button>
+                <button class="btn btn-save" onclick="saveEditedStory()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================
         // Project & Data Management (Firebase-only)
@@ -1104,7 +1219,6 @@
                     const data = doc.data();
                     if (data.userStories && data.userStories.length > 0) {
                         userStories = data.userStories;
-                        document.getElementById('addStoryBtn').style.display = 'block';
                         initializeApp();
                         setupRealtimeListener();
                     } else {
@@ -1145,17 +1259,12 @@
             document.getElementById('highPriorityCount').textContent = '0';
             document.getElementById('totalEffort').textContent = '0';
             
-            // Show/hide add story button based on project existence
-            const addStoryBtn = document.getElementById('addStoryBtn');
-            addStoryBtn.style.display = projectExists ? 'block' : 'none';
-            
             if (projectExists) {
                 // Project exists but has no user stories - show add story button
                 document.getElementById('storiesTableBody').innerHTML = `
                     <tr><td colspan="8" class="empty-state">
                         <h3>No User Stories Yet</h3>
-                        <p>This project doesn't have any user stories. Add your first one!</p>
-                        <button onclick="openAddStoryModal()" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--accent); color: var(--primary); border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">+ Add User Story</button>
+                        <p>This project doesn't have any user stories. Add your first one using the button above!</p>
                     </td></tr>`;
             } else {
                 // No project selected - show create project button
@@ -1423,6 +1532,7 @@
             filteredStories.forEach((story, index) => {
                 const statusClass = getStatusClass(story.Status);
                 const priorityClass = story.Priority === 'High' ? 'priority-high' : 'priority-normal';
+                const isCompleted = story.Status === 'Completed';
                 
                 html += `
                     <tr id="row-${index}">
@@ -1433,7 +1543,13 @@
                         <td><span class="priority-badge ${priorityClass}">${story.Priority || 'Normal'}</span></td>
                         <td>${story.Sprint ? `<span class="sprint-badge">${story.Sprint}</span>` : '-'}</td>
                         <td><span class="effort-badge">${story.Effort_Required || '-'}</span></td>
-                        <td><button class="expand-btn" onclick="toggleExpand(${index})">Details</button></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn edit" onclick="openEditStoryModal('${story.Story_ID}')" title="Edit">✎</button>
+                                <button class="action-btn complete" onclick="markStoryComplete('${story.Story_ID}')" title="Mark Complete" ${isCompleted ? 'disabled' : ''}>✓</button>
+                                <button class="action-btn details" onclick="toggleExpand(${index})">Details</button>
+                            </div>
+                        </td>
                     </tr>
                     <tr class="expanded-content" id="expanded-${index}">
                         <td colspan="8">
@@ -1654,6 +1770,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeAddStoryModal();
+                closeEditStoryModal();
             }
         });
         
@@ -1663,6 +1780,152 @@
                 closeAddStoryModal();
             }
         });
+        
+        document.getElementById('editStoryModal').addEventListener('click', (e) => {
+            if (e.target.id === 'editStoryModal') {
+                closeEditStoryModal();
+            }
+        });
+
+        // ============================================
+        // Edit User Story Modal Functions
+        // ============================================
+        
+        function openEditStoryModal(storyId) {
+            const project = getCurrentProject();
+            if (!project) return;
+            
+            // Find the story in userStories array
+            const story = userStories.find(s => s.Story_ID === storyId);
+            if (!story) {
+                alert('Story not found');
+                return;
+            }
+            
+            // Populate the form with existing values
+            document.getElementById('editStoryId').value = storyId;
+            document.getElementById('editStoryText').value = story.User_Story || '';
+            document.getElementById('editStoryEpic').value = story.Epic || '';
+            document.getElementById('editStoryFeature').value = story.Feature || '';
+            document.getElementById('editStoryPriority').value = story.Priority || '';
+            document.getElementById('editStoryStatus').value = story.Status || 'Yet to start';
+            document.getElementById('editStorySprint').value = story.Sprint || '';
+            document.getElementById('editStoryEffort').value = story.Effort_Required || 8;
+            document.getElementById('editStoryCriteria').value = story.Acceptance_Criteria || '';
+            
+            // Populate sprint dropdown with current project sprints
+            db.collection('projects').doc(project).get().then(doc => {
+                if (doc.exists) {
+                    const sprintData = doc.data().sprintData || [];
+                    const select = document.getElementById('editStorySprint');
+                    select.innerHTML = '<option value="">Not Assigned</option>';
+                    sprintData.forEach(sprint => {
+                        const opt = document.createElement('option');
+                        opt.value = sprint.Sprint;
+                        opt.textContent = `Sprint ${sprint.Sprint}${sprint.Theme ? ': ' + sprint.Theme : ''}`;
+                        if (sprint.Sprint == story.Sprint) opt.selected = true;
+                        select.appendChild(opt);
+                    });
+                }
+            });
+            
+            document.getElementById('editStoryModal').classList.add('visible');
+        }
+        
+        function closeEditStoryModal() {
+            document.getElementById('editStoryModal').classList.remove('visible');
+        }
+        
+        async function saveEditedStory() {
+            const project = getCurrentProject();
+            if (!project) return;
+            
+            const storyId = document.getElementById('editStoryId').value;
+            const storyText = document.getElementById('editStoryText').value.trim();
+            const epic = document.getElementById('editStoryEpic').value.trim();
+            
+            if (!storyText || !epic) {
+                alert('Please fill in the User Story and Epic fields');
+                return;
+            }
+            
+            try {
+                // Find and update the story
+                const storyIndex = userStories.findIndex(s => s.Story_ID === storyId);
+                if (storyIndex === -1) {
+                    alert('Story not found');
+                    return;
+                }
+                
+                // Update story object
+                userStories[storyIndex] = {
+                    ...userStories[storyIndex],
+                    User_Story: storyText,
+                    Epic: epic,
+                    Feature: document.getElementById('editStoryFeature').value.trim() || null,
+                    Priority: document.getElementById('editStoryPriority').value || null,
+                    Status: document.getElementById('editStoryStatus').value,
+                    Sprint: document.getElementById('editStorySprint').value ? 
+                            parseInt(document.getElementById('editStorySprint').value) : null,
+                    Effort_Required: parseInt(document.getElementById('editStoryEffort').value) || 8,
+                    Acceptance_Criteria: document.getElementById('editStoryCriteria').value.trim() || null,
+                    Updated_At: new Date().toISOString()
+                };
+                
+                // Save to Firebase
+                await db.collection('projects').doc(project).update({
+                    userStories: userStories,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                closeEditStoryModal();
+                
+                // Data will auto-refresh via realtime listener
+                
+            } catch (error) {
+                console.error('Error saving story:', error);
+                alert('Error saving user story: ' + error.message);
+            }
+        }
+        
+        // ============================================
+        // Quick Actions
+        // ============================================
+        
+        async function markStoryComplete(storyId) {
+            const project = getCurrentProject();
+            if (!project) return;
+            
+            // Find the story
+            const storyIndex = userStories.findIndex(s => s.Story_ID === storyId);
+            if (storyIndex === -1) {
+                alert('Story not found');
+                return;
+            }
+            
+            // Check if already completed
+            if (userStories[storyIndex].Status === 'Completed') {
+                return;
+            }
+            
+            try {
+                // Update status to completed
+                userStories[storyIndex].Status = 'Completed';
+                userStories[storyIndex].Completed_At = new Date().toISOString();
+                
+                // Save to Firebase
+                await db.collection('projects').doc(project).update({
+                    userStories: userStories,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Data will auto-refresh via realtime listener
+                
+            } catch (error) {
+                console.error('Error completing story:', error);
+                alert('Error marking story complete: ' + error.message);
+            }
+        }
 
         async function init() {
             await loadProjectList();
