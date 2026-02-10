@@ -623,6 +623,164 @@
             color: var(--text-muted);
         }
 
+        /* Add Story Button */
+        .add-story-btn {
+            padding: 0.5rem 1rem;
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-story-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 230, 0, 0.3);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 2rem;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 2px solid var(--accent);
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--bg-hover);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            color: var(--accent);
+            font-size: 1.25rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--text);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--bg-hover);
+            background: var(--primary);
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--bg-hover);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel {
+            background: var(--bg-hover);
+            color: var(--text);
+        }
+
+        .btn-cancel:hover {
+            background: var(--secondary);
+        }
+
+        .btn-save {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        .btn-save:hover {
+            box-shadow: 0 4px 12px rgba(255, 230, 0, 0.3);
+        }
+
+        .btn-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -687,6 +845,7 @@
                 <a href="index.html" class="nav-tab active">User Stories</a>
                 <a href="sprint-planner.html" class="nav-tab">Sprint Timeline</a>
                 <a href="progress-report.html" class="nav-tab">Progress Report</a>
+                <a href="transcript-analyzer.html" class="nav-tab">Transcript Analyzer</a>
                 <a href="project-builder.html" class="nav-tab" style="background: rgba(255,230,0,0.15); border-color: var(--accent); color: var(--accent);">+ New Project</a>
             </nav>
         </div>
@@ -786,7 +945,10 @@
         <div class="table-container">
             <div class="table-header">
                 <h2>User Stories</h2>
-                <span class="result-count"><span id="filteredCount">0</span> stories</span>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span class="result-count"><span id="filteredCount">0</span> stories</span>
+                    <button onclick="openAddStoryModal()" class="add-story-btn" id="addStoryBtn" style="display: none;">+ Add User Story</button>
+                </div>
             </div>
             <div class="table-scroll">
                 <table class="stories-table">
@@ -806,6 +968,71 @@
                         <tr><td colspan="8" class="loading">Loading user stories...</td></tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Story Modal -->
+    <div class="modal-overlay" id="addStoryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Add New User Story</h2>
+                <button class="modal-close" onclick="closeAddStoryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>User Story *</label>
+                    <textarea id="newStoryText" placeholder="As a [user type], I want [action] so that [benefit]..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Epic *</label>
+                        <input type="text" id="newStoryEpic" placeholder="e.g., User Authentication">
+                    </div>
+                    <div class="form-group">
+                        <label>Feature</label>
+                        <input type="text" id="newStoryFeature" placeholder="e.g., Login Flow">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="newStoryPriority">
+                            <option value="">Not Set</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="newStoryStatus">
+                            <option value="Yet to start">Yet to Start</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Sprint</label>
+                        <select id="newStorySprint">
+                            <option value="">Not Assigned</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Effort (hours)</label>
+                        <input type="number" id="newStoryEffort" value="8" min="1" max="200">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Acceptance Criteria</label>
+                    <textarea id="newStoryCriteria" placeholder="Define what 'done' looks like..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeAddStoryModal()">Cancel</button>
+                <button class="btn btn-save" onclick="saveNewStory()">Add User Story</button>
             </div>
         </div>
     </div>
@@ -866,27 +1093,48 @@
             filteredStories = [];
             
             if (!project) {
-                showEmptyState();
+                showEmptyState(false); // No project selected
                 return;
             }
             
             try {
                 const doc = await db.collection('projects').doc(project).get();
                 
-                if (doc.exists && doc.data().userStories) {
-                    userStories = doc.data().userStories;
-                    initializeApp();
-                    setupRealtimeListener();
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.userStories && data.userStories.length > 0) {
+                        userStories = data.userStories;
+                        document.getElementById('addStoryBtn').style.display = 'block';
+                        initializeApp();
+                        setupRealtimeListener();
+                    } else {
+                        // Project exists but no user stories
+                        showEmptyState(true);
+                        populateSprintDropdown(data.sprintData || []);
+                        setupRealtimeListener();
+                    }
                 } else {
-                    showEmptyState();
+                    showEmptyState(false); // Project doesn't exist in DB
                 }
             } catch (error) {
                 console.error('Error loading data:', error);
-                showEmptyState();
+                showEmptyState(false);
             }
         }
         
-        function showEmptyState() {
+        // Populate sprint dropdown in modal from project data
+        function populateSprintDropdown(sprintData) {
+            const select = document.getElementById('newStorySprint');
+            select.innerHTML = '<option value="">Not Assigned</option>';
+            sprintData.forEach(sprint => {
+                const opt = document.createElement('option');
+                opt.value = sprint.Sprint;
+                opt.textContent = `Sprint ${sprint.Sprint}${sprint.Theme ? ': ' + sprint.Theme : ''}`;
+                select.appendChild(opt);
+            });
+        }
+        
+        function showEmptyState(projectExists = false) {
             // Clear stats
             userStories = [];
             filteredStories = [];
@@ -897,12 +1145,27 @@
             document.getElementById('highPriorityCount').textContent = '0';
             document.getElementById('totalEffort').textContent = '0';
             
-            document.getElementById('storiesTableBody').innerHTML = `
-                <tr><td colspan="8" class="empty-state">
-                    <h3>No User Stories</h3>
-                    <p>Create a project using the Project Builder to add user stories.</p>
-                    <a href="project-builder.html" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--accent); color: var(--primary); border-radius: 8px; text-decoration: none; font-weight: 600;">+ Create New Project</a>
-                </td></tr>`;
+            // Show/hide add story button based on project existence
+            const addStoryBtn = document.getElementById('addStoryBtn');
+            addStoryBtn.style.display = projectExists ? 'block' : 'none';
+            
+            if (projectExists) {
+                // Project exists but has no user stories - show add story button
+                document.getElementById('storiesTableBody').innerHTML = `
+                    <tr><td colspan="8" class="empty-state">
+                        <h3>No User Stories Yet</h3>
+                        <p>This project doesn't have any user stories. Add your first one!</p>
+                        <button onclick="openAddStoryModal()" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--accent); color: var(--primary); border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">+ Add User Story</button>
+                    </td></tr>`;
+            } else {
+                // No project selected - show create project button
+                document.getElementById('storiesTableBody').innerHTML = `
+                    <tr><td colspan="8" class="empty-state">
+                        <h3>No Project Selected</h3>
+                        <p>Select a project from the dropdown or create a new one.</p>
+                        <a href="project-builder.html" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--accent); color: var(--primary); border-radius: 8px; text-decoration: none; font-weight: 600;">+ Create New Project</a>
+                    </td></tr>`;
+            }
         }
         
         // Real-time listener
@@ -1293,6 +1556,114 @@
         }
 
         // Initialize
+        // ============================================
+        // Add User Story Modal Functions
+        // ============================================
+        
+        function openAddStoryModal() {
+            const project = getCurrentProject();
+            if (!project) {
+                alert('Please select a project first');
+                return;
+            }
+            
+            // Reset form
+            document.getElementById('newStoryText').value = '';
+            document.getElementById('newStoryEpic').value = '';
+            document.getElementById('newStoryFeature').value = '';
+            document.getElementById('newStoryPriority').value = '';
+            document.getElementById('newStoryStatus').value = 'Yet to start';
+            document.getElementById('newStorySprint').value = '';
+            document.getElementById('newStoryEffort').value = '8';
+            document.getElementById('newStoryCriteria').value = '';
+            
+            // Populate sprint dropdown with current project sprints
+            db.collection('projects').doc(project).get().then(doc => {
+                if (doc.exists) {
+                    populateSprintDropdown(doc.data().sprintData || []);
+                }
+            });
+            
+            document.getElementById('addStoryModal').classList.add('visible');
+        }
+        
+        function closeAddStoryModal() {
+            document.getElementById('addStoryModal').classList.remove('visible');
+        }
+        
+        async function saveNewStory() {
+            const project = getCurrentProject();
+            if (!project) return;
+            
+            const storyText = document.getElementById('newStoryText').value.trim();
+            const epic = document.getElementById('newStoryEpic').value.trim();
+            
+            if (!storyText || !epic) {
+                alert('Please fill in the User Story and Epic fields');
+                return;
+            }
+            
+            try {
+                // Get current stories to generate new ID
+                const doc = await db.collection('projects').doc(project).get();
+                const currentStories = doc.exists ? (doc.data().userStories || []) : [];
+                
+                // Generate new story ID
+                const maxId = currentStories.reduce((max, s) => {
+                    const num = parseInt(s.Story_ID?.replace('US-', '') || '0');
+                    return num > max ? num : max;
+                }, 0);
+                const newId = `US-${String(maxId + 1).padStart(3, '0')}`;
+                
+                // Create new story object
+                const newStory = {
+                    Story_ID: newId,
+                    User_Story: storyText,
+                    Epic: epic,
+                    Feature: document.getElementById('newStoryFeature').value.trim() || null,
+                    Priority: document.getElementById('newStoryPriority').value || null,
+                    Status: document.getElementById('newStoryStatus').value,
+                    Sprint: document.getElementById('newStorySprint').value ? 
+                            parseInt(document.getElementById('newStorySprint').value) : null,
+                    Effort_Required: parseInt(document.getElementById('newStoryEffort').value) || 8,
+                    Acceptance_Criteria: document.getElementById('newStoryCriteria').value.trim() || null,
+                    Created_At: new Date().toISOString(),
+                    Added_Manually: true
+                };
+                
+                // Add to stories array
+                currentStories.push(newStory);
+                
+                // Save to Firebase
+                await db.collection('projects').doc(project).update({
+                    userStories: currentStories,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                closeAddStoryModal();
+                
+                // Data will auto-refresh via realtime listener
+                
+            } catch (error) {
+                console.error('Error saving story:', error);
+                alert('Error saving user story: ' + error.message);
+            }
+        }
+        
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAddStoryModal();
+            }
+        });
+        
+        // Close modal on backdrop click
+        document.getElementById('addStoryModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addStoryModal') {
+                closeAddStoryModal();
+            }
+        });
+
         async function init() {
             await loadProjectList();
             await loadData();
