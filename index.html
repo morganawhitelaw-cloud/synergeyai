@@ -830,6 +830,15 @@
             background: rgba(255, 230, 0, 0.3);
         }
 
+        .action-btn.delete {
+            background: rgba(248, 113, 113, 0.2);
+            color: #f87171;
+        }
+
+        .action-btn.delete:hover {
+            background: rgba(248, 113, 113, 0.4);
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -1547,6 +1556,7 @@
                             <div class="action-buttons">
                                 <button class="action-btn edit" onclick="openEditStoryModal('${story.Story_ID}')" title="Edit">✎</button>
                                 <button class="action-btn complete" onclick="markStoryComplete('${story.Story_ID}')" title="Mark Complete" ${isCompleted ? 'disabled' : ''}>✓</button>
+                                <button class="action-btn delete" onclick="deleteStory('${story.Story_ID}')" title="Delete">✕</button>
                                 <button class="action-btn details" onclick="toggleExpand(${index})">Details</button>
                             </div>
                         </td>
@@ -1924,6 +1934,40 @@
             } catch (error) {
                 console.error('Error completing story:', error);
                 alert('Error marking story complete: ' + error.message);
+            }
+        }
+        
+        async function deleteStory(storyId) {
+            const project = getCurrentProject();
+            if (!project) return;
+            
+            // Find the story
+            const story = userStories.find(s => s.Story_ID === storyId);
+            if (!story) {
+                alert('Story not found');
+                return;
+            }
+            
+            // Confirm deletion
+            if (!confirm(`Are you sure you want to delete "${story.Story_ID}: ${story.User_Story?.substring(0, 50)}..."?\n\nThis action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                // Remove story from array
+                userStories = userStories.filter(s => s.Story_ID !== storyId);
+                
+                // Save to Firebase
+                await db.collection('projects').doc(project).update({
+                    userStories: userStories,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Data will auto-refresh via realtime listener
+                
+            } catch (error) {
+                console.error('Error deleting story:', error);
+                alert('Error deleting user story: ' + error.message);
             }
         }
 
