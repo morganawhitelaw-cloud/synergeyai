@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SynergEY.ai - User Story Tracker</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCXytykHi2P1VqdJeMNw8UsdI6E9RShnY8",
+            authDomain: "bpm-dashboard-62dd6.firebaseapp.com",
+            projectId: "bpm-dashboard-62dd6",
+            storageBucket: "bpm-dashboard-62dd6.firebasestorage.app",
+            messagingSenderId: "859717657831",
+            appId: "1:859717657831:web:ad6d59f531761bbdf2ae42"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
     <style>
         :root {
             --primary: #2e2e38;
@@ -664,8 +679,7 @@
         <div class="header-content">
             <div class="logo-dropdown">
                 <select id="projectSelector" onchange="switchProject(this.value)">
-                    <option value="synergey">SynergEY.ai</option>
-                    <option value="spendcube">SpendCube</option>
+                    <option value="">Loading...</option>
                 </select>
                 <span class="page-title">User Stories</span>
             </div>
@@ -673,6 +687,7 @@
                 <a href="index.html" class="nav-tab active">User Stories</a>
                 <a href="sprint-planner.html" class="nav-tab">Sprint Timeline</a>
                 <a href="progress-report.html" class="nav-tab">Progress Report</a>
+                <a href="project-builder.html" class="nav-tab" style="background: rgba(255,230,0,0.15); border-color: var(--accent); color: var(--accent);">+ New Project</a>
             </nav>
         </div>
     </header>
@@ -796,57 +811,100 @@
     </div>
 
     <script>
-        // Project configuration
-        const projects = {
-            synergey: {
-                name: 'SynergEY.ai',
-                userStoriesFile: 'user_stories.json',
-                sprintPlanFile: 'sprint_plan.json',
-                effortDataFile: 'effort_data.json'
-            },
-            spendcube: {
-                name: 'SpendCube',
-                userStoriesFile: 'spendcube_user_stories.json',
-                sprintPlanFile: 'spendcube_sprint_plan.json',
-                effortDataFile: 'spendcube_effort_data.json'
-            }
-        };
+        // ============================================
+        // Project & Data Management (Firebase-only)
+        // ============================================
+        
+        let userStories = [];
+        let filteredStories = [];
+        let unsubscribe = null;
 
-        // Get current project from localStorage
         function getCurrentProject() {
-            return localStorage.getItem('selectedProject') || 'synergey';
+            return localStorage.getItem('selectedProject') || null;
         }
 
-        // Switch project
         function switchProject(projectId) {
             localStorage.setItem('selectedProject', projectId);
             loadData();
         }
 
-        // Initialize project selector
-        function initProjectSelector() {
-            const project = getCurrentProject();
-            document.getElementById('projectSelector').value = project;
+        // Load available projects from Firebase
+        async function loadProjectList() {
+            const selector = document.getElementById('projectSelector');
+            try {
+                const snapshot = await db.collection('projects').get();
+                selector.innerHTML = '<option value="">Select Project...</option>';
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const name = data.config?.name || doc.id;
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = name;
+                    selector.appendChild(option);
+                });
+
+                const current = getCurrentProject();
+                if (current && selector.querySelector(`option[value="${current}"]`)) {
+                    selector.value = current;
+                } else if (snapshot.size > 0) {
+                    selector.selectedIndex = 1;
+                    localStorage.setItem('selectedProject', selector.value);
+                }
+            } catch (error) {
+                console.error('Error loading projects:', error);
+            }
         }
 
-        // User stories data will be loaded here
-        let userStories = [];
-        let filteredStories = [];
-
-        // Load data from JSON file
+        // Load user stories from Firebase
         async function loadData() {
             const project = getCurrentProject();
-            const config = projects[project];
+            
+            if (!project) {
+                showEmptyState();
+                return;
+            }
             
             try {
-                const response = await fetch(config.userStoriesFile);
-                userStories = await response.json();
-                initializeApp();
+                const doc = await db.collection('projects').doc(project).get();
+                
+                if (doc.exists && doc.data().userStories) {
+                    userStories = doc.data().userStories;
+                    initializeApp();
+                    setupRealtimeListener();
+                } else {
+                    showEmptyState();
+                }
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('storiesTableBody').innerHTML = 
-                    '<tr><td colspan="8" class="empty-state"><h3>No User Stories</h3><p>No user stories available for ' + config.name + '.</p></td></tr>';
+                showEmptyState();
             }
+        }
+        
+        function showEmptyState() {
+            document.getElementById('storiesTableBody').innerHTML = `
+                <tr><td colspan="8" class="empty-state">
+                    <h3>No User Stories</h3>
+                    <p>Create a project using the Project Builder to add user stories.</p>
+                    <a href="project-builder.html" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--accent); color: var(--primary); border-radius: 8px; text-decoration: none; font-weight: 600;">+ Create New Project</a>
+                </td></tr>`;
+        }
+        
+        // Real-time listener
+        function setupRealtimeListener() {
+            const project = getCurrentProject();
+            if (unsubscribe) unsubscribe();
+            if (!project) return;
+            
+            unsubscribe = db.collection('projects').doc(project).onSnapshot((doc) => {
+                if (doc.exists && doc.data().userStories) {
+                    const newStories = doc.data().userStories;
+                    if (JSON.stringify(newStories) !== JSON.stringify(userStories)) {
+                        userStories = newStories;
+                        initializeApp();
+                    }
+                }
+            });
         }
 
         // Generate AI Suggested Solution based on user story content
@@ -1221,8 +1279,11 @@
         }
 
         // Initialize
-        initProjectSelector();
-        loadData();
+        async function init() {
+            await loadProjectList();
+            await loadData();
+        }
+        init();
     </script>
 </body>
 </html>

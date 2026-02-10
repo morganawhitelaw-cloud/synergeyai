@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Builder - Create New Project</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCXytykHi2P1VqdJeMNw8UsdI6E9RShnY8",
+            authDomain: "bpm-dashboard-62dd6.firebaseapp.com",
+            projectId: "bpm-dashboard-62dd6",
+            storageBucket: "bpm-dashboard-62dd6.firebasestorage.app",
+            messagingSenderId: "859717657831",
+            appId: "1:859717657831:web:ad6d59f531761bbdf2ae42"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+    <style>
+        :root {
+            --primary: #2e2e38;
+            --accent: #ffe600;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a1a2e 100%);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo {
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .page-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .nav-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+        .nav-tab.active { background: var(--accent); color: var(--primary); border-color: var(--accent); font-weight: 600; }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .builder-intro {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .builder-intro h2 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .builder-intro p {
+            color: var(--text-muted);
+        }
+
+        .form-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-number {
+            background: var(--accent);
+            color: var(--primary);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .section-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        /* Dynamic Table Styles */
+        .dynamic-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+
+        .dynamic-table th {
+            background: var(--bg);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dynamic-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dynamic-table input,
+        .dynamic-table textarea,
+        .dynamic-table select {
+            width: 100%;
+            padding: 0.5rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .dynamic-table textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .add-row-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 230, 0, 0.1);
+            border: 1px dashed var(--accent);
+            border-radius: 8px;
+            color: var(--accent);
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .add-row-btn:hover {
+            background: rgba(255, 230, 0, 0.2);
+        }
+
+        .remove-row-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: none;
+            color: var(--danger);
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .remove-row-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Submit Section */
+        .submit-section {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a1a2e 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid var(--accent);
+        }
+
+        .submit-section h3 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .submit-section p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .submit-btn {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(255, 230, 0, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Success Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid var(--accent);
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal h3 {
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-btn {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0 0.5rem;
+        }
+
+        .modal-btn.secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        /* Complexity Indicator */
+        .complexity-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .complexity-low { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .complexity-medium { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .complexity-high { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-dropdown">
+                <span class="logo">BPM Dashboard</span>
+                <span class="page-title">Project Builder</span>
+            </div>
+            <nav class="nav-tabs">
+                <a href="index.html" class="nav-tab">User Stories</a>
+                <a href="sprint-planner.html" class="nav-tab">Sprint Timeline</a>
+                <a href="progress-report.html" class="nav-tab">Progress Report</a>
+                <a href="project-builder.html" class="nav-tab active">+ New Project</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="builder-intro">
+            <h2>Create a New Project</h2>
+            <p>Fill out this form to create a new project from your workflow definition. The system will automatically estimate complexity, assign sprints, and generate a timeline.</p>
+        </div>
+
+        <form id="projectForm">
+            <!-- Section 1: Basic Info -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-number">1</span>
+                    <span class="section-title">Project Information</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Project Name *</label>
+                        <input type="text" id="projectName" required placeholder="e.g., Client Spend Analysis">
+                    </div>
+                    <div class="form-group">
+                        <label>Project ID *</label>
+                        <input type="text" id="projectId" required placeholder="e.g., spend_analysis" pattern="[a-z0-9_]+" title="Lowercase letters, numbers, and underscores only">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Owner</label>
+                        <input type="text" id="owner" placeholder="e.g., Alex Whitelaw">
+                    </div>
+                    <div class="form-group">
+                        <label>Start Date *</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Purpose -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-number">2</span>
+                    <span class="section-title">Purpose of This Workflow</span>
+                </div>
+                <p class="section-hint">1-3 sentences describing what this workflow is intended to produce or enable.</p>
+                <div class="form-group">
+                    <textarea id="purpose" placeholder="Describe the purpose of this workflow..."></textarea>
+                </div>
+            </div>
+
+            <!-- Section 3: Outputs -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-number">3</span>
+                    <span class="section-title">Final Outputs</span>
+                </div>
+                <p class="section-hint">List the explicit outputs this workflow produces (e.g., reports, documents, files).</p>
+                <table class="dynamic-table" id="outputsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Output Name</th>
+                            <th>Description</th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="outputsBody">
+                        <tr>
+                            <td><input type="text" placeholder="Output name"></td>
+                            <td><input type="text" placeholder="Brief description"></td>
+                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="add-row-btn" onclick="addOutputRow()">+ Add Output</button>
+            </div>
+
+            <!-- Section 4: Process Steps -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-number">4</span>
+                    <span class="section-title">Sequential Process Steps</span>
+                </div>
+                <p class="section-hint">A step-by-step checklist. Each step should start with a verb and clearly move the process forward. Complexity is auto-estimated.</p>
+                <table class="dynamic-table" id="stepsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th style="width: 35%;">Step Description *</th>
+                            <th style="width: 25%;">Notes / Assumptions</th>
+                            <th style="width: 15%;">Dependencies</th>
+                            <th style="width: 80px;">Complexity</th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="stepsBody">
+                        <tr>
+                            <td style="text-align: center; font-weight: 600;">1</td>
+                            <td><textarea placeholder="Describe the step (start with a verb)..." oninput="updateComplexity(this)"></textarea></td>
+                            <td><input type="text" placeholder="Notes..."></td>
+                            <td><input type="text" placeholder="e.g., Step 1"></td>
+                            <td><span class="complexity-badge complexity-low">Low</span></td>
+                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="add-row-btn" onclick="addStepRow()">+ Add Step</button>
+            </div>
+
+            <!-- Section 5: Inputs Required -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-number">5</span>
+                    <span class="section-title">Inputs Required</span>
+                </div>
+                <p class="section-hint">What is needed to execute this workflow? (e.g., data files, approvals, resources)</p>
+                <table class="dynamic-table" id="inputsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Input</th>
+                            <th style="width: 30%;">Description</th>
+                            <th style="width: 20%;">Source</th>
+                            <th style="width: 15%;">Related Step</th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="inputsBody">
+                        <tr>
+                            <td><input type="text" placeholder="Input name"></td>
+                            <td><input type="text" placeholder="Description"></td>
+                            <td><input type="text" placeholder="Source"></td>
+                            <td><input type="text" placeholder="Step #"></td>
+                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="add-row-btn" onclick="addInputRow()">+ Add Input</button>
+            </div>
+
+            <!-- Section 6: Key Decisions -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-number">6</span>
+                    <span class="section-title">Key Decisions & Judgment Points</span>
+                </div>
+                <p class="section-hint">Identify where human judgment, interpretation, or decision-making occurs.</p>
+                <table class="dynamic-table" id="decisionsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">Step #</th>
+                            <th style="width: 50%;">Decision Required</th>
+                            <th style="width: 25%;">Who Decides</th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="decisionsBody">
+                        <tr>
+                            <td><input type="text" placeholder="Step #"></td>
+                            <td><input type="text" placeholder="What decision needs to be made?"></td>
+                            <td><input type="text" placeholder="Role/Person"></td>
+                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="add-row-btn" onclick="addDecisionRow()">+ Add Decision Point</button>
+            </div>
+
+            <!-- Section 7: Definition of Done -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-number">7</span>
+                    <span class="section-title">Definition of "Done"</span>
+                </div>
+                <p class="section-hint">What conditions must be met before this workflow is considered finished?</p>
+                <div class="form-group">
+                    <textarea id="doneCriteria" placeholder="Describe what 'complete' looks like..."></textarea>
+                </div>
+            </div>
+
+            <!-- Section 8: Out of Scope -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-number">8</span>
+                    <span class="section-title">Out of Scope</span>
+                </div>
+                <p class="section-hint">Explicitly list what is excluded from this workflow to avoid scope creep.</p>
+                <div class="form-group">
+                    <textarea id="outOfScope" placeholder="What is NOT included..."></textarea>
+                </div>
+            </div>
+
+            <!-- Submit Section -->
+            <div class="submit-section">
+                <h3>Ready to Generate Project?</h3>
+                <p>The system will estimate complexity, assign sprints, and create your project timeline.</p>
+                <button type="submit" class="submit-btn" id="submitBtn">Generate Project</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal">
+            <div class="modal-icon">🎉</div>
+            <h3>Project Created!</h3>
+            <p id="modalMessage">Your project has been generated and saved.</p>
+            <button class="modal-btn" onclick="goToProject()">View Project</button>
+            <button class="modal-btn secondary" onclick="closeModal()">Create Another</button>
+        </div>
+    </div>
+
+    <script>
+        // Complexity keywords
+        const COMPLEXITY_KEYWORDS = {
+            high: ['integrate', 'build', 'develop', 'architect', 'design', 'implement', 
+                   'complex', 'multiple', 'automate', 'optimize', 'transform', 'migrate', 'create', 'establish'],
+            medium: ['analyze', 'validate', 'configure', 'review', 'test', 'evaluate',
+                     'assess', 'compare', 'reconcile', 'adjust', 'modify', 'compile', 'generate'],
+            low: ['collect', 'gather', 'document', 'list', 'identify', 'copy',
+                  'export', 'send', 'receive', 'format', 'update', 'check', 'finalize']
+        };
+
+        const HOURS_BY_COMPLEXITY = { high: 16, medium: 8, low: 4 };
+
+        let createdProjectId = null;
+
+        // Set default date to today
+        document.getElementById('startDate').valueAsDate = new Date();
+
+        // Auto-generate project ID from name
+        document.getElementById('projectName').addEventListener('input', function() {
+            const id = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+            document.getElementById('projectId').value = id;
+        });
+
+        // Estimate complexity based on description
+        function estimateComplexity(description) {
+            const text = description.toLowerCase();
+            
+            let highCount = COMPLEXITY_KEYWORDS.high.filter(kw => text.includes(kw)).length;
+            let mediumCount = COMPLEXITY_KEYWORDS.medium.filter(kw => text.includes(kw)).length;
+            let lowCount = COMPLEXITY_KEYWORDS.low.filter(kw => text.includes(kw)).length;
+            
+            if (highCount > 0) return 'high';
+            if (mediumCount > 0) return 'medium';
+            return 'low';
+        }
+
+        function updateComplexity(textarea) {
+            const row = textarea.closest('tr');
+            const badge = row.querySelector('.complexity-badge');
+            const complexity = estimateComplexity(textarea.value);
+            
+            badge.className = 'complexity-badge complexity-' + complexity;
+            badge.textContent = complexity.charAt(0).toUpperCase() + complexity.slice(1);
+        }
+
+        // Add row functions
+        function addOutputRow() {
+            const tbody = document.getElementById('outputsBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" placeholder="Output name"></td>
+                <td><input type="text" placeholder="Brief description"></td>
+                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function addStepRow() {
+            const tbody = document.getElementById('stepsBody');
+            const stepNum = tbody.children.length + 1;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="text-align: center; font-weight: 600;">${stepNum}</td>
+                <td><textarea placeholder="Describe the step (start with a verb)..." oninput="updateComplexity(this)"></textarea></td>
+                <td><input type="text" placeholder="Notes..."></td>
+                <td><input type="text" placeholder="e.g., Step ${stepNum - 1}"></td>
+                <td><span class="complexity-badge complexity-low">Low</span></td>
+                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function addInputRow() {
+            const tbody = document.getElementById('inputsBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" placeholder="Input name"></td>
+                <td><input type="text" placeholder="Description"></td>
+                <td><input type="text" placeholder="Source"></td>
+                <td><input type="text" placeholder="Step #"></td>
+                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function addDecisionRow() {
+            const tbody = document.getElementById('decisionsBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" placeholder="Step #"></td>
+                <td><input type="text" placeholder="What decision needs to be made?"></td>
+                <td><input type="text" placeholder="Role/Person"></td>
+                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function removeRow(btn) {
+            const tbody = btn.closest('tbody');
+            if (tbody.children.length > 1) {
+                btn.closest('tr').remove();
+                // Renumber steps if it's the steps table
+                if (tbody.id === 'stepsBody') {
+                    Array.from(tbody.children).forEach((row, idx) => {
+                        row.cells[0].textContent = idx + 1;
+                    });
+                }
+            }
+        }
+
+        // Collect form data
+        function collectFormData() {
+            const data = {
+                metadata: {
+                    title: document.getElementById('projectName').value,
+                    owner: document.getElementById('owner').value,
+                    date: document.getElementById('startDate').value,
+                    status: 'Active'
+                },
+                purpose: document.getElementById('purpose').value,
+                outputs: [],
+                steps: [],
+                inputs: [],
+                decisions: [],
+                done_criteria: document.getElementById('doneCriteria').value,
+                out_of_scope: document.getElementById('outOfScope').value
+            };
+
+            // Collect outputs
+            document.querySelectorAll('#outputsBody tr').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs[0].value) {
+                    data.outputs.push({
+                        name: inputs[0].value,
+                        description: inputs[1].value
+                    });
+                }
+            });
+
+            // Collect steps
+            document.querySelectorAll('#stepsBody tr').forEach((row, idx) => {
+                const textarea = row.querySelector('textarea');
+                const inputs = row.querySelectorAll('input');
+                if (textarea.value) {
+                    data.steps.push({
+                        step_num: String(idx + 1),
+                        description: textarea.value,
+                        notes: inputs[0].value,
+                        dependencies: inputs[1].value
+                    });
+                }
+            });
+
+            // Collect inputs
+            document.querySelectorAll('#inputsBody tr').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs[0].value) {
+                    data.inputs.push({
+                        name: inputs[0].value,
+                        description: inputs[1].value,
+                        source: inputs[2].value,
+                        related_step: inputs[3].value
+                    });
+                }
+            });
+
+            // Collect decisions
+            document.querySelectorAll('#decisionsBody tr').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs[1].value) {
+                    data.decisions.push({
+                        step_num: inputs[0].value,
+                        decision: inputs[1].value,
+                        who_decides: inputs[2].value
+                    });
+                }
+            });
+
+            return data;
+        }
+
+        // Generate project data
+        function generateProjectData(formData, projectId, projectName, startDate) {
+            const SPRINT_DURATION = 14;
+            const HOURS_PER_DAY = 8;
+            const sprintCapacity = SPRINT_DURATION * HOURS_PER_DAY * 0.7;
+
+            let sprints = [];
+            let currentSprint = {
+                sprint_num: 1,
+                start_date: new Date(startDate),
+                end_date: new Date(new Date(startDate).getTime() + SPRINT_DURATION * 24 * 60 * 60 * 1000),
+                tasks: [],
+                total_hours: 0
+            };
+
+            // Process steps into tasks
+            formData.steps.forEach(step => {
+                const complexity = estimateComplexity(step.description);
+                const hours = HOURS_BY_COMPLEXITY[complexity];
+                const hasDecision = formData.decisions.some(d => d.step_num === step.step_num);
+
+                const task = {
+                    step_num: step.step_num,
+                    description: step.description,
+                    notes: step.notes,
+                    dependencies: step.dependencies,
+                    complexity: complexity,
+                    estimated_hours: hasDecision ? hours + 4 : hours, // Add time for decision points
+                    has_decision: hasDecision,
+                    status: 'Not Started',
+                    progress: 0
+                };
+
+                if (currentSprint.total_hours + task.estimated_hours > sprintCapacity) {
+                    sprints.push(currentSprint);
+                    const newStart = new Date(currentSprint.end_date.getTime() + 24 * 60 * 60 * 1000);
+                    currentSprint = {
+                        sprint_num: sprints.length + 1,
+                        start_date: newStart,
+                        end_date: new Date(newStart.getTime() + SPRINT_DURATION * 24 * 60 * 60 * 1000),
+                        tasks: [],
+                        total_hours: 0
+                    };
+                }
+
+                currentSprint.tasks.push(task);
+                currentSprint.total_hours += task.estimated_hours;
+            });
+
+            if (currentSprint.tasks.length > 0) {
+                sprints.push(currentSprint);
+            }
+
+            // Generate sprint_plan format
+            const sprintPlan = [];
+            sprints.forEach(sprint => {
+                // Milestone
+                sprintPlan.push({
+                    Sprint: sprint.sprint_num,
+                    Type: 'Milestone',
+                    Description: `Sprint ${sprint.sprint_num}: ${formData.metadata.title}`,
+                    Status: 'Not Started',
+                    Start_Date: sprint.start_date.toISOString().split('T')[0],
+                    End_Date: sprint.end_date.toISOString().split('T')[0],
+                    Duration: SPRINT_DURATION,
+                    Progress: 0,
+                    Comments: null
+                });
+
+                // Tasks
+                let taskStart = new Date(sprint.start_date);
+                sprint.tasks.forEach(task => {
+                    const duration = Math.max(1, Math.floor(task.estimated_hours / HOURS_PER_DAY));
+                    const taskEnd = new Date(taskStart.getTime() + duration * 24 * 60 * 60 * 1000);
+
+                    sprintPlan.push({
+                        Sprint: sprint.sprint_num,
+                        Type: 'Task',
+                        Description: task.description,
+                        Status: task.status,
+                        Start_Date: taskStart.toISOString().split('T')[0],
+                        End_Date: taskEnd.toISOString().split('T')[0],
+                        Duration: duration,
+                        Progress: task.progress,
+                        Comments: task.notes || null,
+                        Complexity: task.complexity,
+                        Estimated_Hours: task.estimated_hours,
+                        Has_Decision_Point: task.has_decision
+                    });
+
+                    taskStart = taskEnd;
+                });
+            });
+
+            // Generate user stories
+            const userStories = [];
+            let storyId = 1;
+            sprints.forEach(sprint => {
+                sprint.tasks.forEach(task => {
+                    userStories.push({
+                        ID: storyId++,
+                        EPIC: formData.metadata.title,
+                        Feature: `Sprint ${sprint.sprint_num} - Step ${task.step_num}`,
+                        User_Story: `As a user, I need to ${task.description.toLowerCase()}`,
+                        Scenario: task.notes || 'Standard workflow execution',
+                        Acceptance_Criteria: formData.done_criteria || 'Task completed and validated',
+                        Status: task.status,
+                        Priority: task.complexity === 'high' ? 'High' : (task.complexity === 'medium' ? 'Medium' : 'Low'),
+                        Sprint: sprint.sprint_num,
+                        Complexity: task.complexity,
+                        Estimated_Hours: task.estimated_hours
+                    });
+                });
+            });
+
+            // Generate effort data
+            const totalHours = sprints.reduce((sum, s) => sum + s.total_hours, 0);
+            const totalWeeks = sprints.length * 2;
+            const effortData = {
+                modules: [{
+                    module: formData.metadata.title,
+                    total_fe: 0,
+                    total_be: totalHours,
+                    fe_sprint: 0,
+                    be_sprint: Math.round(totalHours / sprints.length),
+                    start_week: 1,
+                    end_week: totalWeeks
+                }],
+                summary: {
+                    total_fe_hours: 0,
+                    total_be_hours: totalHours,
+                    total_hours: totalHours,
+                    fe_resources: 0,
+                    be_resources: 1,
+                    total_weeks: totalWeeks,
+                    total_sprints: sprints.length,
+                    timeline: `${sprints[0].start_date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} - ${sprints[sprints.length-1].end_date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}`,
+                    hours_per_week_fe: 0,
+                    hours_per_week_be: Math.round(totalHours / totalWeeks)
+                }
+            };
+
+            return {
+                sprintData: sprintPlan,
+                userStories: userStories,
+                effortData: effortData,
+                config: {
+                    id: projectId,
+                    name: projectName,
+                    epic: formData.metadata,
+                    inputs: formData.inputs,
+                    decisions: formData.decisions,
+                    purpose: formData.purpose,
+                    outputs: formData.outputs,
+                    done_criteria: formData.done_criteria,
+                    out_of_scope: formData.out_of_scope
+                }
+            };
+        }
+
+        // Handle form submission
+        document.getElementById('projectForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const projectId = document.getElementById('projectId').value;
+            const projectName = document.getElementById('projectName').value;
+            const startDate = document.getElementById('startDate').value;
+
+            // Validate at least one step
+            const stepsBody = document.getElementById('stepsBody');
+            const hasSteps = Array.from(stepsBody.querySelectorAll('textarea')).some(ta => ta.value.trim());
+            if (!hasSteps) {
+                alert('Please add at least one process step.');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Generating...';
+
+            try {
+                const formData = collectFormData();
+                const projectData = generateProjectData(formData, projectId, projectName, startDate);
+
+                // Save to Firebase
+                await db.collection('projects').doc(projectId).set({
+                    sprintData: projectData.sprintData,
+                    effortData: projectData.effortData,
+                    userStories: projectData.userStories,
+                    config: projectData.config,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                createdProjectId = projectId;
+
+                // Show success modal
+                document.getElementById('modalMessage').textContent = 
+                    `"${projectName}" has been created with ${projectData.sprintData.length} items across ${projectData.effortData.summary.total_sprints} sprint(s).`;
+                document.getElementById('successModal').classList.add('active');
+
+            } catch (error) {
+                console.error('Error creating project:', error);
+                alert('Error creating project. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Generate Project';
+            }
+        });
+
+        function goToProject() {
+            localStorage.setItem('selectedProject', createdProjectId);
+            window.location.href = 'sprint-planner.html';
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('active');
+            document.getElementById('projectForm').reset();
+            document.getElementById('startDate').valueAsDate = new Date();
+            
+            // Reset tables to single row
+            ['outputsBody', 'stepsBody', 'inputsBody', 'decisionsBody'].forEach(id => {
+                const tbody = document.getElementById(id);
+                while (tbody.children.length > 1) {
+                    tbody.lastChild.remove();
+                }
+                // Clear first row inputs
+                tbody.querySelectorAll('input, textarea').forEach(el => el.value = '');
+            });
+        }
+    </script>
+</body>
+</html>
