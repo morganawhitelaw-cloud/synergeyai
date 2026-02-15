@@ -620,17 +620,8 @@
         </div>
     </div>
 
+    <script src="js/complexity-estimator.js"></script>
     <script>
-        // Complexity keywords
-        const COMPLEXITY_KEYWORDS = {
-            high: ['integrate', 'build', 'develop', 'architect', 'design', 'implement', 
-                   'complex', 'multiple', 'automate', 'optimize', 'transform', 'migrate', 'create', 'establish'],
-            medium: ['analyze', 'validate', 'configure', 'review', 'test', 'evaluate',
-                     'assess', 'compare', 'reconcile', 'adjust', 'modify', 'compile', 'generate'],
-            low: ['collect', 'gather', 'document', 'list', 'identify', 'copy',
-                  'export', 'send', 'receive', 'format', 'update', 'check', 'finalize']
-        };
-
         const HOURS_BY_COMPLEXITY = { high: 16, medium: 8, low: 4 };
 
         let createdProjectId = null;
@@ -643,19 +634,6 @@
             const id = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
             document.getElementById('projectId').value = id;
         });
-
-        // Estimate complexity based on description
-        function estimateComplexity(description) {
-            const text = description.toLowerCase();
-            
-            let highCount = COMPLEXITY_KEYWORDS.high.filter(kw => text.includes(kw)).length;
-            let mediumCount = COMPLEXITY_KEYWORDS.medium.filter(kw => text.includes(kw)).length;
-            let lowCount = COMPLEXITY_KEYWORDS.low.filter(kw => text.includes(kw)).length;
-            
-            if (highCount > 0) return 'high';
-            if (mediumCount > 0) return 'medium';
-            return 'low';
-        }
 
         function updateComplexity(textarea) {
             const row = textarea.closest('tr');
