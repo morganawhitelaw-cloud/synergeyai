@@ -1312,6 +1312,7 @@
         </div>
     </div>
 
+    <script src="js/utils.js"></script>
     <script>
         // ============================================
         // Project & Data Management (Firebase-only)
@@ -2227,11 +2228,6 @@
             });
 
             container.innerHTML = html;
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr || dateStr === 'TBD') return 'TBD';
-            return new Date(dateStr).toLocaleDateString('en', { month: 'short', day: 'numeric' });
         }
 
         function escapeHtml(text) {
