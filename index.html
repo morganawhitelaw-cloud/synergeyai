@@ -1455,7 +1455,8 @@
                 document.getElementById('storiesTableBody').innerHTML = `
                     <tr><td colspan="8" class="empty-state">
                         <h3>No User Stories Yet</h3>
-                        <p>This project doesn't have any user stories. Add your first one using the button above!</p>
+                        <p>This project doesn't have any user stories yet.</p>
+                        <button onclick="openAddStoryModal()" class="add-story-btn" style="margin-top: 1rem;">+ Create First User Story</button>
                     </td></tr>`;
             } else {
                 // No project selected - show create project button
@@ -1736,10 +1737,10 @@
                         <td><span class="effort-badge">${story.Effort_Required || '-'}</span></td>
                         <td>
                             <div class="action-buttons">
-                                <button class="action-btn edit" onclick="openEditStoryModal('${story.Story_ID}')" title="Edit">✎</button>
-                                <button class="action-btn complete" onclick="markStoryComplete('${story.Story_ID}')" title="Mark Complete" ${isCompleted ? 'disabled' : ''}>✓</button>
-                                <button class="action-btn delete" onclick="deleteStory('${story.Story_ID}')" title="Delete">✕</button>
-                                <button class="action-btn details" onclick="toggleExpand(${index})">Details</button>
+                                <button class="action-btn edit" onclick="openEditStoryModal('${story.Story_ID}')" title="Edit" aria-label="Edit story">✎</button>
+                                <button class="action-btn complete" onclick="markStoryComplete('${story.Story_ID}')" title="Mark Complete" aria-label="Mark story as complete" ${isCompleted ? 'disabled' : ''}>✓</button>
+                                <button class="action-btn delete" onclick="deleteStory('${story.Story_ID}')" title="Delete" aria-label="Delete story">✕</button>
+                                <button class="action-btn details" onclick="toggleExpand(${index})" aria-label="View details">Details</button>
                             </div>
                         </td>
                     </tr>
