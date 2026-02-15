@@ -846,7 +846,7 @@
                 <span id="apiKeyStatus" class="api-key-status"></span>
             </div>
             <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">
-                Your API key is stored locally in your browser and never sent to our servers. Get one at <a href="https://platform.openai.com/api-keys" target="_blank" style="color: var(--accent);">platform.openai.com</a>
+                Your API key is required for each session and is not stored. Get one at <a href="https://platform.openai.com/api-keys" target="_blank" style="color: var(--accent);">platform.openai.com</a>
             </p>
         </div>
         
@@ -1016,7 +1016,8 @@ Example format:
         
         async function init() {
             await loadProjectList();
-            loadApiKey();
+            // Clear any previously stored API key for security
+            localStorage.removeItem('openai_api_key');
             updateCharCount();
             setupEventListeners();
         }
@@ -1150,14 +1151,6 @@ Example format:
         }
         
         // API Key management
-        function loadApiKey() {
-            const savedKey = localStorage.getItem('openai_api_key');
-            if (savedKey) {
-                document.getElementById('apiKeyInput').value = savedKey;
-                validateApiKey();
-            }
-        }
-        
         function validateApiKey() {
             const key = document.getElementById('apiKeyInput').value.trim();
             const status = document.getElementById('apiKeyStatus');
@@ -1165,7 +1158,7 @@ Example format:
             if (key.startsWith('sk-') && key.length > 20) {
                 status.textContent = '✓ Valid format';
                 status.className = 'api-key-status valid';
-                localStorage.setItem('openai_api_key', key);
+                // Key is kept in memory only
             } else if (key.length > 0) {
                 status.textContent = '✗ Invalid format';
                 status.className = 'api-key-status invalid';
