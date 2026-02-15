@@ -1,0 +1,1 @@
+SUCCESS: generateAISolution is defined on window
