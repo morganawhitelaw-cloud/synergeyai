@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Utils</title>
+    <script src="utils.js"></script>
+</head>
+<body>
+    <h1>Test Utils</h1>
+    <div id="result"></div>
+    <script>
+        try {
+            const input = '<script>alert("xss")<\/script>';
+            const expected = '&lt;script&gt;alert("xss")&lt;/script&gt;';
+            const result = escapeHtml(input);
+
+            const div = document.getElementById('result');
+            if (result === expected) {
+                div.textContent = 'PASS: escapeHtml works correctly.';
+                div.style.color = 'green';
+                console.log('PASS');
+            } else {
+                div.textContent = `FAIL: Expected "${expected}", got "${result}"`;
+                div.style.color = 'red';
+                console.error('FAIL');
+            }
+
+            // Test null/undefined
+            if (escapeHtml(null) === '' && escapeHtml(undefined) === '') {
+                 const p = document.createElement('p');
+                 p.textContent = 'PASS: escapeHtml handles null/undefined correctly.';
+                 p.style.color = 'green';
+                 div.appendChild(p);
+            } else {
+                 const p = document.createElement('p');
+                 p.textContent = 'FAIL: escapeHtml failed on null/undefined';
+                 p.style.color = 'red';
+                 div.appendChild(p);
+            }
+
+        } catch (e) {
+            document.getElementById('result').textContent = 'ERROR: ' + e.message;
+            document.getElementById('result').style.color = 'red';
+            console.error(e);
+        }
+    </script>
+</body>
+</html>

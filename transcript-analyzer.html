@@ -969,6 +969,8 @@ Example format:
     
     <div class="notification" id="notification"></div>
 
+    <script src="utils.js"></script>
+
     <script>
         // Global state
         let currentProject = null;
@@ -1724,12 +1726,6 @@ Only include categories that have items. If no items for a category, omit it ent
                     </div>
                 </div>
             `;
-        }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
         }
         
         // Suggestion actions

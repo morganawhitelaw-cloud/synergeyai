@@ -1343,6 +1343,7 @@
         </div>
     </div>
 
+    <script src="utils.js"></script>
     <script>
         // ============================================
         // Project & Data Management (Firebase-only)
@@ -1887,13 +1888,6 @@
             if (status === 'In Progress') return 'status-in-progress';
             if (status === 'Yet to start') return 'status-yet-to-start';
             return 'status-not-set';
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
         }
 
         function truncate(text, length) {
