@@ -1109,7 +1109,7 @@ Example format:
                 contextDiv.innerHTML = `
                     <div class="context-item">
                         <span class="context-label">Project Name</span>
-                        <span class="context-value">${config.name || currentProject}</span>
+                        <span class="context-value">${escapeHtml(config.name || currentProject)}</span>
                     </div>
                     <div class="context-item">
                         <span class="context-label">Total Sprints</span>
@@ -1134,7 +1134,7 @@ Example format:
                     <div class="context-item" style="flex-direction: column; align-items: flex-start;">
                         <span class="context-label">Epic List</span>
                         <span style="color: var(--text); font-size: 0.85rem; margin-top: 0.5rem;">
-                            ${epics.length > 0 ? epics.map(e => `• ${e}`).join('<br>') : 'No epics defined'}
+                            ${epics.length > 0 ? epics.map(e => `• ${escapeHtml(e)}`).join('<br>') : 'No epics defined'}
                         </span>
                     </div>
                 `;
@@ -1540,41 +1540,41 @@ Only include categories that have items. If no items for a category, omit it ent
             const { id, category, status, data } = suggestion;
             const catInfo = CATEGORIES[category];
             
-            let titleText = data.title || data.user_story || data.theme || 'Suggestion';
+            let titleText = escapeHtml(data.title || data.user_story || data.theme || 'Suggestion');
             let bodyText = '';
             let metaTags = '';
             
             switch (category) {
                 case 'new_user_stories':
-                    bodyText = data.user_story || '';
+                    bodyText = escapeHtml(data.user_story || '');
                     metaTags = `
-                        <span class="meta-tag">Epic: ${data.epic || 'Unassigned'}</span>
-                        <span class="meta-tag priority-${(data.priority || 'medium').toLowerCase()}">Priority: ${data.priority || 'Medium'}</span>
-                        <span class="meta-tag">Effort: ${data.effort || 5} pts</span>
+                        <span class="meta-tag">Epic: ${escapeHtml(data.epic || 'Unassigned')}</span>
+                        <span class="meta-tag priority-${escapeHtml((data.priority || 'medium').toLowerCase())}">Priority: ${escapeHtml(data.priority || 'Medium')}</span>
+                        <span class="meta-tag">Effort: ${escapeHtml(data.effort || 5)} pts</span>
                     `;
                     break;
                 case 'new_tasks':
-                    bodyText = data.description || '';
+                    bodyText = escapeHtml(data.description || '');
                     metaTags = `
-                        <span class="meta-tag">Sprint ${data.sprint || '?'}</span>
-                        <span class="meta-tag">${data.estimated_hours || 8}h</span>
-                        <span class="meta-tag priority-${(data.priority || 'medium').toLowerCase()}">${data.priority || 'Medium'}</span>
-                        <span class="meta-tag">Assignee: ${data.assignee || 'Unassigned'}</span>
+                        <span class="meta-tag">Sprint ${escapeHtml(data.sprint || '?')}</span>
+                        <span class="meta-tag">${escapeHtml(data.estimated_hours || 8)}h</span>
+                        <span class="meta-tag priority-${escapeHtml((data.priority || 'medium').toLowerCase())}">${escapeHtml(data.priority || 'Medium')}</span>
+                        <span class="meta-tag">Assignee: ${escapeHtml(data.assignee || 'Unassigned')}</span>
                     `;
                     break;
                 case 'updates':
-                    titleText = `Update ${data.item_type}: ${data.item_id}`;
-                    bodyText = Object.entries(data.changes || {}).map(([k, v]) => `${k}: ${v}`).join(', ');
-                    metaTags = `<span class="meta-tag">${data.item_type}</span>`;
+                    titleText = `Update ${escapeHtml(data.item_type)}: ${escapeHtml(data.item_id)}`;
+                    bodyText = Object.entries(data.changes || {}).map(([k, v]) => `${escapeHtml(k)}: ${escapeHtml(v)}`).join(', ');
+                    metaTags = `<span class="meta-tag">${escapeHtml(data.item_type)}</span>`;
                     break;
                 case 'new_sprints':
-                    titleText = `Sprint ${data.sprint_number}: ${data.theme}`;
-                    bodyText = `${data.start_date} to ${data.end_date}`;
+                    titleText = `Sprint ${escapeHtml(data.sprint_number)}: ${escapeHtml(data.theme)}`;
+                    bodyText = `${escapeHtml(data.start_date)} to ${escapeHtml(data.end_date)}`;
                     break;
                 case 'risks':
-                    bodyText = data.description || '';
+                    bodyText = escapeHtml(data.description || '');
                     metaTags = `
-                        <span class="meta-tag priority-${(data.severity || 'medium').toLowerCase()}">Severity: ${data.severity || 'Medium'}</span>
+                        <span class="meta-tag priority-${escapeHtml((data.severity || 'medium').toLowerCase())}">Severity: ${escapeHtml(data.severity || 'Medium')}</span>
                     `;
                     break;
             }
@@ -1604,7 +1604,7 @@ Only include categories that have items. If no items for a category, omit it ent
                     <div class="suggestion-meta">${metaTags}</div>
                     ${data.reasoning ? `
                         <div class="suggestion-reasoning">
-                            <strong>AI Reasoning:</strong> ${data.reasoning}
+                            <strong>AI Reasoning:</strong> ${escapeHtml(data.reasoning)}
                         </div>
                     ` : ''}
                     ${renderEditForm(suggestion)}
