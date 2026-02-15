@@ -1744,9 +1744,7 @@
                         </td>
                     </tr>
                     <tr class="expanded-content" id="expanded-${index}">
-                        <td colspan="8">
-                            ${renderExpandedContent(story)}
-                        </td>
+                        <td colspan="8"></td>
                     </tr>
                 `;
             });
@@ -1876,6 +1874,11 @@
             document.querySelectorAll('.stories-table tr').forEach(el => el.classList.remove('expanded'));
             
             if (!isShowing) {
+                const contentCell = expandedRow.querySelector('td');
+                if (!contentCell.innerHTML.trim()) {
+                    contentCell.innerHTML = renderExpandedContent(filteredStories[index]);
+                }
+
                 expandedRow.classList.add('show');
                 mainRow.classList.add('expanded');
             }
