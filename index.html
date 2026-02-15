@@ -2431,8 +2431,8 @@
             const { githubRepo, githubToken } = settings;
             const relevantFiles = [];
             
-            // Search for each term
-            for (const term of searchTerms.slice(0, 3)) {
+            // Search for each term in parallel
+            const promises = searchTerms.slice(0, 3).map(async (term) => {
                 try {
                     const response = await fetch(
                         `https://api.github.com/search/code?q=${encodeURIComponent(term)}+repo:${githubRepo}&per_page=5`,
@@ -2445,25 +2445,28 @@
                     );
                     
                     if (response.ok) {
-                        const data = await response.json();
-                        data.items?.forEach(item => {
-                            if (!relevantFiles.find(f => f.path === item.path)) {
-                                relevantFiles.push({
-                                    path: item.path,
-                                    name: item.name,
-                                    url: item.html_url,
-                                    score: item.score
-                                });
-                            }
-                        });
+                        return await response.json();
                     }
-                    
-                    // Rate limiting - wait between requests
-                    await new Promise(r => setTimeout(r, 500));
                 } catch (e) {
                     console.warn(`Search failed for term: ${term}`, e);
                 }
-            }
+                return null;
+            });
+
+            const results = await Promise.all(promises);
+
+            results.forEach(data => {
+                data?.items?.forEach(item => {
+                    if (!relevantFiles.find(f => f.path === item.path)) {
+                        relevantFiles.push({
+                            path: item.path,
+                            name: item.name,
+                            url: item.html_url,
+                            score: item.score
+                        });
+                    }
+                });
+            });
             
             return relevantFiles;
         }
