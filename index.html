@@ -997,6 +997,33 @@
                 gap: 1rem;
             }
         }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            background: var(--success);
+            color: var(--primary);
+            font-weight: 600;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .notification.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification.error {
+            background: var(--danger);
+            color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -1342,6 +1369,8 @@
             </div>
         </div>
     </div>
+
+    <div class="notification" id="notification" role="alert" aria-live="assertive" aria-atomic="true"></div>
 
     <script>
         // ============================================
@@ -1930,7 +1959,7 @@
         function openAddStoryModal() {
             const project = getCurrentProject();
             if (!project) {
-                alert('Please select a project first');
+                showNotification('Please select a project first', 'error');
                 return;
             }
             
@@ -1966,7 +1995,7 @@
             const epic = document.getElementById('newStoryEpic').value.trim();
             
             if (!storyText || !epic) {
-                alert('Please fill in the User Story and Epic fields');
+                showNotification('Please fill in the User Story and Epic fields', 'error');
                 return;
             }
             
@@ -2013,7 +2042,7 @@
                 
             } catch (error) {
                 console.error('Error saving story:', error);
-                alert('Error saving user story: ' + error.message);
+                showNotification('Error saving user story: ' + error.message, 'error');
             }
         }
         
@@ -2056,7 +2085,7 @@
             // Find the story in userStories array
             const story = userStories.find(s => s.Story_ID === storyId);
             if (!story) {
-                alert('Story not found');
+                showNotification('Story not found', 'error');
                 return;
             }
             
@@ -2103,7 +2132,7 @@
             const epic = document.getElementById('editStoryEpic').value.trim();
             
             if (!storyText || !epic) {
-                alert('Please fill in the User Story and Epic fields');
+                showNotification('Please fill in the User Story and Epic fields', 'error');
                 return;
             }
             
@@ -2111,7 +2140,7 @@
                 // Find and update the story
                 const storyIndex = userStories.findIndex(s => s.Story_ID === storyId);
                 if (storyIndex === -1) {
-                    alert('Story not found');
+                    showNotification('Story not found', 'error');
                     return;
                 }
                 
@@ -2142,7 +2171,7 @@
                 
             } catch (error) {
                 console.error('Error saving story:', error);
-                alert('Error saving user story: ' + error.message);
+                showNotification('Error saving user story: ' + error.message, 'error');
             }
         }
         
@@ -2157,7 +2186,7 @@
             // Find the story
             const storyIndex = userStories.findIndex(s => s.Story_ID === storyId);
             if (storyIndex === -1) {
-                alert('Story not found');
+                showNotification('Story not found', 'error');
                 return;
             }
             
@@ -2181,7 +2210,7 @@
                 
             } catch (error) {
                 console.error('Error completing story:', error);
-                alert('Error marking story complete: ' + error.message);
+                showNotification('Error marking story complete: ' + error.message, 'error');
             }
         }
         
@@ -2192,7 +2221,7 @@
             // Find the story
             const story = userStories.find(s => s.Story_ID === storyId);
             if (!story) {
-                alert('Story not found');
+                showNotification('Story not found', 'error');
                 return;
             }
             
@@ -2215,7 +2244,7 @@
                 
             } catch (error) {
                 console.error('Error deleting story:', error);
-                alert('Error deleting user story: ' + error.message);
+                showNotification('Error deleting user story: ' + error.message, 'error');
             }
         }
 
@@ -2228,7 +2257,7 @@
         async function openProjectSettingsModal() {
             const project = getCurrentProject();
             if (!project) {
-                alert('Please select a project first');
+                showNotification('Please select a project first', 'error');
                 return;
             }
             
@@ -2332,10 +2361,10 @@
                 
                 projectSettings = settings;
                 closeProjectSettingsModal();
-                alert('Settings saved successfully!');
+                showNotification('Settings saved successfully!', 'success');
             } catch (error) {
                 console.error('Error saving settings:', error);
-                alert('Error saving settings: ' + error.message);
+                showNotification('Error saving settings: ' + error.message, 'error');
             }
         }
         
@@ -2356,14 +2385,14 @@
             const settings = data.settings || {};
             
             if (!settings.githubRepo || !settings.githubToken) {
-                alert('Please configure GitHub settings first (click Settings button)');
+                showNotification('Please configure GitHub settings first (click Settings button)', 'error');
                 openProjectSettingsModal();
                 return;
             }
             
             const openaiKey = settings.openaiKey || localStorage.getItem('openai_api_key');
             if (!openaiKey) {
-                alert('Please configure OpenAI API key in Settings');
+                showNotification('Please configure OpenAI API key in Settings', 'error');
                 openProjectSettingsModal();
                 return;
             }
@@ -2613,6 +2642,25 @@ Be specific and reference the actual code patterns you see in the repository.`;
                 userStories: userStories,
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
             });
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            if (!notification) return;
+
+            if (notification.timeoutId) clearTimeout(notification.timeoutId);
+
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+
+            // Force reflow for animation restart
+            void notification.offsetWidth;
+
+            notification.classList.add('visible');
+
+            notification.timeoutId = setTimeout(() => {
+                notification.classList.remove('visible');
+            }, 3000);
         }
 
         async function init() {
