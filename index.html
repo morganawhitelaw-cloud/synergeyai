@@ -895,6 +895,18 @@
             animation: spin 0.8s linear infinite;
         }
 
+        .btn-loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(46, 46, 56, 0.3);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
@@ -1202,7 +1214,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-cancel" onclick="closeAddStoryModal()">Cancel</button>
-                <button class="btn btn-save" onclick="saveNewStory()">Add User Story</button>
+                <button class="btn btn-save" id="saveNewStoryBtn" onclick="saveNewStory()">Add User Story</button>
             </div>
         </div>
     </div>
@@ -1268,7 +1280,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-cancel" onclick="closeEditStoryModal()">Cancel</button>
-                <button class="btn btn-save" onclick="saveEditedStory()">Save Changes</button>
+                <button class="btn btn-save" id="saveEditStoryBtn" onclick="saveEditedStory()">Save Changes</button>
             </div>
         </div>
     </div>
@@ -1351,6 +1363,24 @@
         let userStories = [];
         let filteredStories = [];
         let unsubscribe = null;
+
+        function setLoading(btnId, isLoading) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+
+            if (isLoading) {
+                if (!btn.dataset.originalText) {
+                    btn.dataset.originalText = btn.textContent;
+                }
+                btn.disabled = true;
+                btn.innerHTML = '<span class="btn-loading-spinner"></span> Saving...';
+            } else {
+                btn.disabled = false;
+                if (btn.dataset.originalText) {
+                    btn.textContent = btn.dataset.originalText;
+                }
+            }
+        }
 
         function getCurrentProject() {
             return localStorage.getItem('selectedProject') || null;
@@ -1970,6 +2000,8 @@
                 return;
             }
             
+            setLoading('saveNewStoryBtn', true);
+
             try {
                 // Get current stories to generate new ID
                 const doc = await db.collection('projects').doc(project).get();
@@ -2014,6 +2046,8 @@
             } catch (error) {
                 console.error('Error saving story:', error);
                 alert('Error saving user story: ' + error.message);
+            } finally {
+                setLoading('saveNewStoryBtn', false);
             }
         }
         
@@ -2107,6 +2141,8 @@
                 return;
             }
             
+            setLoading('saveEditStoryBtn', true);
+
             try {
                 // Find and update the story
                 const storyIndex = userStories.findIndex(s => s.Story_ID === storyId);
@@ -2143,6 +2179,8 @@
             } catch (error) {
                 console.error('Error saving story:', error);
                 alert('Error saving user story: ' + error.message);
+            } finally {
+                setLoading('saveEditStoryBtn', false);
             }
         }
         
