@@ -1151,22 +1151,22 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>User Story *</label>
+                    <label for="newStoryText">User Story *</label>
                     <textarea id="newStoryText" placeholder="As a [user type], I want [action] so that [benefit]..."></textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Epic *</label>
+                        <label for="newStoryEpic">Epic *</label>
                         <input type="text" id="newStoryEpic" placeholder="e.g., User Authentication">
                     </div>
                     <div class="form-group">
-                        <label>Feature</label>
+                        <label for="newStoryFeature">Feature</label>
                         <input type="text" id="newStoryFeature" placeholder="e.g., Login Flow">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Priority</label>
+                        <label for="newStoryPriority">Priority</label>
                         <select id="newStoryPriority">
                             <option value="">Not Set</option>
                             <option value="High">High</option>
@@ -1175,7 +1175,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Status</label>
+                        <label for="newStoryStatus">Status</label>
                         <select id="newStoryStatus">
                             <option value="Yet to start">Yet to Start</option>
                             <option value="In Progress">In Progress</option>
@@ -1185,24 +1185,24 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Sprint</label>
+                        <label for="newStorySprint">Sprint</label>
                         <select id="newStorySprint">
                             <option value="">Not Assigned</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Effort (hours)</label>
+                        <label for="newStoryEffort">Effort (hours)</label>
                         <input type="number" id="newStoryEffort" value="8" min="1" max="200">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Acceptance Criteria</label>
+                    <label for="newStoryCriteria">Acceptance Criteria</label>
                     <textarea id="newStoryCriteria" placeholder="Define what 'done' looks like..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-cancel" onclick="closeAddStoryModal()">Cancel</button>
-                <button class="btn btn-save" onclick="saveNewStory()">Add User Story</button>
+                <button class="btn btn-save" id="saveNewStoryBtn" onclick="saveNewStory()">Add User Story</button>
             </div>
         </div>
     </div>
@@ -1217,22 +1217,22 @@
             <div class="modal-body">
                 <input type="hidden" id="editStoryId">
                 <div class="form-group">
-                    <label>User Story *</label>
+                    <label for="editStoryText">User Story *</label>
                     <textarea id="editStoryText" placeholder="As a [user type], I want [action] so that [benefit]..."></textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Epic *</label>
+                        <label for="editStoryEpic">Epic *</label>
                         <input type="text" id="editStoryEpic" placeholder="e.g., User Authentication">
                     </div>
                     <div class="form-group">
-                        <label>Feature</label>
+                        <label for="editStoryFeature">Feature</label>
                         <input type="text" id="editStoryFeature" placeholder="e.g., Login Flow">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Priority</label>
+                        <label for="editStoryPriority">Priority</label>
                         <select id="editStoryPriority">
                             <option value="">Not Set</option>
                             <option value="High">High</option>
@@ -1241,7 +1241,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Status</label>
+                        <label for="editStoryStatus">Status</label>
                         <select id="editStoryStatus">
                             <option value="Yet to start">Yet to Start</option>
                             <option value="In Progress">In Progress</option>
@@ -1251,24 +1251,24 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Sprint</label>
+                        <label for="editStorySprint">Sprint</label>
                         <select id="editStorySprint">
                             <option value="">Not Assigned</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Effort (hours)</label>
+                        <label for="editStoryEffort">Effort (hours)</label>
                         <input type="number" id="editStoryEffort" value="8" min="1" max="200">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Acceptance Criteria</label>
+                    <label for="editStoryCriteria">Acceptance Criteria</label>
                     <textarea id="editStoryCriteria" placeholder="Define what 'done' looks like..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-cancel" onclick="closeEditStoryModal()">Cancel</button>
-                <button class="btn btn-save" onclick="saveEditedStory()">Save Changes</button>
+                <button class="btn btn-save" id="saveEditStoryBtn" onclick="saveEditedStory()">Save Changes</button>
             </div>
         </div>
     </div>
@@ -1292,13 +1292,13 @@
                 </p>
                 
                 <div class="form-group">
-                    <label>GitHub Repository</label>
+                    <label for="settingsGitHubRepo">GitHub Repository</label>
                     <input type="text" id="settingsGitHubRepo" placeholder="owner/repository (e.g., microsoft/vscode)">
                     <small style="color: var(--text-muted); font-size: 0.8rem;">Format: owner/repo-name</small>
                 </div>
                 
                 <div class="form-group">
-                    <label>GitHub Personal Access Token</label>
+                    <label for="settingsGitHubToken">GitHub Personal Access Token</label>
                     <div style="display: flex; gap: 0.5rem;">
                         <input type="password" id="settingsGitHubToken" placeholder="ghp_xxxxxxxxxxxx" style="flex: 1;">
                         <button class="btn btn-cancel" onclick="toggleGitHubTokenVisibility()" style="padding: 0.5rem 1rem;">Show</button>
@@ -1309,7 +1309,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Default Branch</label>
+                    <label for="settingsGitHubBranch">Default Branch</label>
                     <input type="text" id="settingsGitHubBranch" placeholder="main" value="main">
                 </div>
                 
@@ -1326,7 +1326,7 @@
                 <h3 style="color: var(--text); margin-bottom: 1rem; font-size: 1rem;">🤖 OpenAI Configuration</h3>
                 
                 <div class="form-group">
-                    <label>OpenAI API Key</label>
+                    <label for="settingsOpenAIKey">OpenAI API Key</label>
                     <div style="display: flex; gap: 0.5rem;">
                         <input type="password" id="settingsOpenAIKey" placeholder="sk-..." style="flex: 1;">
                         <button class="btn btn-cancel" onclick="toggleOpenAIKeyVisibility()" style="padding: 0.5rem 1rem;">Show</button>
@@ -1338,7 +1338,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-cancel" onclick="closeProjectSettingsModal()">Cancel</button>
-                <button class="btn btn-save" onclick="saveProjectSettings()">Save Settings</button>
+                <button class="btn btn-save" id="saveSettingsBtn" onclick="saveProjectSettings()">Save Settings</button>
             </div>
         </div>
     </div>
@@ -1736,10 +1736,10 @@
                         <td><span class="effort-badge">${story.Effort_Required || '-'}</span></td>
                         <td>
                             <div class="action-buttons">
-                                <button class="action-btn edit" onclick="openEditStoryModal('${story.Story_ID}')" title="Edit">✎</button>
-                                <button class="action-btn complete" onclick="markStoryComplete('${story.Story_ID}')" title="Mark Complete" ${isCompleted ? 'disabled' : ''}>✓</button>
-                                <button class="action-btn delete" onclick="deleteStory('${story.Story_ID}')" title="Delete">✕</button>
-                                <button class="action-btn details" onclick="toggleExpand(${index})">Details</button>
+                                <button class="action-btn edit" onclick="openEditStoryModal('${story.Story_ID}')" title="Edit" aria-label="Edit story ${story.Story_ID}">✎</button>
+                                <button class="action-btn complete" onclick="markStoryComplete('${story.Story_ID}')" title="Mark Complete" aria-label="Mark story ${story.Story_ID} as complete" ${isCompleted ? 'disabled' : ''}>✓</button>
+                                <button class="action-btn delete" onclick="deleteStory('${story.Story_ID}')" title="Delete" aria-label="Delete story ${story.Story_ID}">✕</button>
+                                <button class="action-btn details" onclick="toggleExpand(${index})" aria-label="View details for story ${story.Story_ID}">Details</button>
                             </div>
                         </td>
                     </tr>
@@ -1969,6 +1969,11 @@
                 alert('Please fill in the User Story and Epic fields');
                 return;
             }
+
+            const btn = document.getElementById('saveNewStoryBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="ai-loading"></span> Saving...';
             
             try {
                 // Get current stories to generate new ID
@@ -2014,6 +2019,9 @@
             } catch (error) {
                 console.error('Error saving story:', error);
                 alert('Error saving user story: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         }
         
@@ -2106,6 +2114,11 @@
                 alert('Please fill in the User Story and Epic fields');
                 return;
             }
+
+            const btn = document.getElementById('saveEditStoryBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="ai-loading"></span> Saving...';
             
             try {
                 // Find and update the story
@@ -2143,6 +2156,9 @@
             } catch (error) {
                 console.error('Error saving story:', error);
                 alert('Error saving user story: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         }
         
@@ -2323,6 +2339,11 @@
             if (settings.openaiKey) {
                 localStorage.setItem('openai_api_key', settings.openaiKey);
             }
+
+            const btn = document.getElementById('saveSettingsBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="ai-loading"></span> Saving...';
             
             try {
                 await db.collection('projects').doc(project).update({
@@ -2336,6 +2357,9 @@
             } catch (error) {
                 console.error('Error saving settings:', error);
                 alert('Error saving settings: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         }
         
