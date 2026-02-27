@@ -1202,7 +1202,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-cancel" onclick="closeAddStoryModal()">Cancel</button>
-                <button class="btn btn-save" onclick="saveNewStory()">Add User Story</button>
+                <button class="btn btn-save" id="saveNewStoryBtn" onclick="saveNewStory()">Add User Story</button>
             </div>
         </div>
     </div>
@@ -1268,7 +1268,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-cancel" onclick="closeEditStoryModal()">Cancel</button>
-                <button class="btn btn-save" onclick="saveEditedStory()">Save Changes</button>
+                <button class="btn btn-save" id="saveEditStoryBtn" onclick="saveEditedStory()">Save Changes</button>
             </div>
         </div>
     </div>
@@ -1338,7 +1338,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-cancel" onclick="closeProjectSettingsModal()">Cancel</button>
-                <button class="btn btn-save" onclick="saveProjectSettings()">Save Settings</button>
+                <button class="btn btn-save" id="saveSettingsBtn" onclick="saveProjectSettings()">Save Settings</button>
             </div>
         </div>
     </div>
@@ -1969,6 +1969,11 @@
                 alert('Please fill in the User Story and Epic fields');
                 return;
             }
+
+            const btn = document.getElementById('saveNewStoryBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="ai-loading" style="border-color: rgba(0,0,0,0.2); border-top-color: var(--primary);"></span> Saving...';
             
             try {
                 // Get current stories to generate new ID
@@ -2014,6 +2019,9 @@
             } catch (error) {
                 console.error('Error saving story:', error);
                 alert('Error saving user story: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         }
         
@@ -2106,6 +2114,11 @@
                 alert('Please fill in the User Story and Epic fields');
                 return;
             }
+
+            const btn = document.getElementById('saveEditStoryBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="ai-loading" style="border-color: rgba(0,0,0,0.2); border-top-color: var(--primary);"></span> Saving...';
             
             try {
                 // Find and update the story
@@ -2143,6 +2156,9 @@
             } catch (error) {
                 console.error('Error saving story:', error);
                 alert('Error saving user story: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         }
         
@@ -2311,6 +2327,11 @@
         async function saveProjectSettings() {
             const project = getCurrentProject();
             if (!project) return;
+
+            const btn = document.getElementById('saveSettingsBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="ai-loading" style="border-color: rgba(0,0,0,0.2); border-top-color: var(--primary);"></span> Saving...';
             
             const settings = {
                 githubRepo: document.getElementById('settingsGitHubRepo').value.trim(),
@@ -2336,6 +2357,9 @@
             } catch (error) {
                 console.error('Error saving settings:', error);
                 alert('Error saving settings: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         }
         
