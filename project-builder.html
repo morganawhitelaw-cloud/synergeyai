@@ -479,7 +479,7 @@
                         <tr>
                             <td><input type="text" placeholder="Output name"></td>
                             <td><input type="text" placeholder="Brief description"></td>
-                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)" aria-label="Remove row" title="Remove row">×</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -511,7 +511,7 @@
                             <td><input type="text" placeholder="Notes..."></td>
                             <td><input type="text" placeholder="e.g., Step 1"></td>
                             <td><span class="complexity-badge complexity-low">Low</span></td>
-                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)" aria-label="Remove row" title="Remove row">×</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -541,7 +541,7 @@
                             <td><input type="text" placeholder="Description"></td>
                             <td><input type="text" placeholder="Source"></td>
                             <td><input type="text" placeholder="Step #"></td>
-                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)" aria-label="Remove row" title="Remove row">×</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -569,7 +569,7 @@
                             <td><input type="text" placeholder="Step #"></td>
                             <td><input type="text" placeholder="What decision needs to be made?"></td>
                             <td><input type="text" placeholder="Role/Person"></td>
-                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)" aria-label="Remove row" title="Remove row">×</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -673,7 +673,7 @@
             row.innerHTML = `
                 <td><input type="text" placeholder="Output name"></td>
                 <td><input type="text" placeholder="Brief description"></td>
-                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)" aria-label="Remove row" title="Remove row">×</button></td>
             `;
             tbody.appendChild(row);
         }
@@ -688,7 +688,7 @@
                 <td><input type="text" placeholder="Notes..."></td>
                 <td><input type="text" placeholder="e.g., Step ${stepNum - 1}"></td>
                 <td><span class="complexity-badge complexity-low">Low</span></td>
-                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)" aria-label="Remove row" title="Remove row">×</button></td>
             `;
             tbody.appendChild(row);
         }
@@ -701,7 +701,7 @@
                 <td><input type="text" placeholder="Description"></td>
                 <td><input type="text" placeholder="Source"></td>
                 <td><input type="text" placeholder="Step #"></td>
-                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)" aria-label="Remove row" title="Remove row">×</button></td>
             `;
             tbody.appendChild(row);
         }
@@ -713,7 +713,7 @@
                 <td><input type="text" placeholder="Step #"></td>
                 <td><input type="text" placeholder="What decision needs to be made?"></td>
                 <td><input type="text" placeholder="Role/Person"></td>
-                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">×</button></td>
+                <td><button type="button" class="remove-row-btn" onclick="removeRow(this)" aria-label="Remove row" title="Remove row">×</button></td>
             `;
             tbody.appendChild(row);
         }
