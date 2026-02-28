@@ -1147,7 +1147,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h2>Add New User Story</h2>
-                <button class="modal-close" onclick="closeAddStoryModal()">&times;</button>
+                <button class="modal-close" onclick="closeAddStoryModal()" aria-label="Close modal">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -1212,7 +1212,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h2>Edit User Story</h2>
-                <button class="modal-close" onclick="closeEditStoryModal()">&times;</button>
+                <button class="modal-close" onclick="closeEditStoryModal()" aria-label="Close modal">&times;</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editStoryId">
@@ -1278,7 +1278,7 @@
         <div class="modal" style="max-width: 650px;">
             <div class="modal-header">
                 <h2>⚙️ Project Settings</h2>
-                <button class="modal-close" onclick="closeProjectSettingsModal()">&times;</button>
+                <button class="modal-close" onclick="closeProjectSettingsModal()" aria-label="Close modal">&times;</button>
             </div>
             <div class="modal-body">
                 <div id="settingsProjectName" style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--bg-hover);">
@@ -1736,9 +1736,9 @@
                         <td><span class="effort-badge">${story.Effort_Required || '-'}</span></td>
                         <td>
                             <div class="action-buttons">
-                                <button class="action-btn edit" onclick="openEditStoryModal('${story.Story_ID}')" title="Edit">✎</button>
-                                <button class="action-btn complete" onclick="markStoryComplete('${story.Story_ID}')" title="Mark Complete" ${isCompleted ? 'disabled' : ''}>✓</button>
-                                <button class="action-btn delete" onclick="deleteStory('${story.Story_ID}')" title="Delete">✕</button>
+                                <button class="action-btn edit" onclick="openEditStoryModal('${story.Story_ID}')" title="Edit" aria-label="Edit">✎</button>
+                                <button class="action-btn complete" onclick="markStoryComplete('${story.Story_ID}')" title="Mark Complete" aria-label="Mark Complete" ${isCompleted ? 'disabled' : ''}>✓</button>
+                                <button class="action-btn delete" onclick="deleteStory('${story.Story_ID}')" title="Delete" aria-label="Delete">✕</button>
                                 <button class="action-btn details" onclick="toggleExpand(${index})">Details</button>
                             </div>
                         </td>
